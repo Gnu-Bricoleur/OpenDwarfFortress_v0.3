@@ -1,4 +1,4 @@
-# OpenDwarfFortress_v0.2
+# OpenDwarfFortress_v0.3
 Refonte du projet ODF avec pyglet (au lieu de pygame).  
 L'objectif est de creer clone du jeu Dwarf Fortress en Open Source en améliorant l'interface et en ajoutant des fonctionnalitées tout en conservant la profondeur de jeu. Vous pouvez voir un exemple de monde generé dans le dossier Capture.  
 
@@ -25,6 +25,9 @@ python main.py
 
 
 ##Modifications :
+
+###Le 2016/01/26 :
+	-ajout de l'inventaire et premier pas vers une interface agreable.
 
 ###Le 2016/01/24 :
 	-passage à la version 0.3 (voir TODO) et nettoyage du code. 

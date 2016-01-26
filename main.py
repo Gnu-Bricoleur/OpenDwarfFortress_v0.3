@@ -865,6 +865,9 @@ class Window(pyglet.window.Window):
 		# When flying gravity has no effect and speed is increased.
 		self.flying = False
 
+		# Creative mode (bloc illimite)
+		self.creative = False
+
 		# Strafing is moving lateral to the direction you are facing,
 		# e.g. moving to the left or right while continuing to face forward.
 		#
@@ -899,7 +902,21 @@ class Window(pyglet.window.Window):
 		self.dy = 0
 
 		# A list of blocks the player can place. Hit num keys to cycle.
-		self.inventory = [BRICK, GRASS, SAND, WATER, STONED, BUISSON, DIRT]
+		# Il faudra pas mettre tous les blocs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		self.inventory = [BRICK, GRASS, SAND, WATER, STONED, BUISSON, DIRT,FLOWER, PNJTETE,PNJCORP,TRONC]
+
+		#Qtite de chaque bloc ds l'inventaire. Il faudra changer les nom de variables
+		self.inventaire=[]
+		for elt in self.inventory:
+			self.inventaire.append(0)
+		
+		# a ameillorer pour le chargement et l'appartition
+		
+		
+		self.blocs = pyglet.image.load('Donnees/Images/textureYOGSCAST-OS.png')
+		self.dirt = self.blocs.get_region(x=32*0, y=32*0, width=32, height=32)
+#		sprite=pyglet.sprite.Sprite(dirt)
+		
 
 		# The current block the user can place. Hit num keys to cycle.
 		self.block = self.inventory[0]
@@ -1143,10 +1160,16 @@ class Window(pyglet.window.Window):
 					((button == mouse.LEFT) and (modifiers & key.MOD_CTRL)):
 				# ON OSX, control + left click = right click.
 				if previous:
-					self.model.add_block(previous, self.block)
+					if self.creative:
+						self.model.add_block(previous, self.block)
+					else :
+						if self.inventaire[self.inventory.index(self.block)] != 0:
+							self.model.add_block(previous, self.block)
+							self.inventaire[self.inventory.index(self.block)] = self.inventaire[self.inventory.index(self.block)] - 1
 			elif button == pyglet.window.mouse.LEFT and block:
 				texture = self.model.world[block]
-				if texture != STONE:
+				if texture != STONE: # mettre ici les bloc indestructibles (ou faire un liste plus popre)
+					self.inventaire[self.inventory.index(self.model.world[block])] = self.inventaire[self.inventory.index(self.model.world[block])] + 1
 					self.model.remove_block(block)
 		else:
 			self.set_exclusive_mouse(True)
@@ -1225,6 +1248,8 @@ class Window(pyglet.window.Window):
 			self.set_exclusive_mouse(False)
 		elif symbol == key.TAB:
 			self.flying = not self.flying
+		elif symbol == key.B:
+			self.creative = not self.creative
 		elif symbol in self.num_keys:
 			index = (symbol - self.num_keys[0]) % len(self.inventory)
 			self.block = self.inventory[index]
@@ -1307,6 +1332,13 @@ class Window(pyglet.window.Window):
 		self.set_2d()
 		self.draw_label()
 		self.draw_reticle()
+		self.draw_inventaire()
+
+
+	def draw_inventaire(self):
+		self.dirt.blit(100,100)
+
+
 
 	def draw_focused_block(self):
 		""" Draw black edges around the block that is currently under the
