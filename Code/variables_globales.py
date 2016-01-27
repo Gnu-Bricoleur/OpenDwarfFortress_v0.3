@@ -60,7 +60,7 @@ mapdungeon = [[ False
 			for y in range(MAP_HEIGHT) ]
 				for x in range(MAP_WIDTH) ]
 
-
+blocdisponibles={}
 
 
 TEXTURE_PATH = 'Donnees/Images/textureYOGSCAST-OS.png'

@@ -88,7 +88,22 @@ def tex_coords(top, bottom, side):
 	result.extend(side * 4)
 	return result
 
+def chargeblocs(chemindacces):
+	listelignes = []
+	fichier = open(chemindacces,'r')
+	listelignesbrutes = fichier.readlines()
+	for ligne in listelignesbrutes:
+		if "#" in ligne:
+			pass
+		else:
+			l=ligne.split(",")
+			listelignes.append(l)
+	fichier.close()
+	for ligne in listelignes:
+		blocdisponibles[ligne[0]]=tex_coords((int(ligne[1]),int(ligne[2])),(int(ligne[3]),int(ligne[4])),(int(ligne[5]),int(ligne[6])))
 
+
+"""
 
 GRASS = tex_coords((0, 15), (2, 15), (3, 15))
 SAND = tex_coords((2, 14), (2, 14), (2, 14))
@@ -103,6 +118,8 @@ TRONC = tex_coords((5,14),(5,14),(4,14))
 FEUILLAGE = tex_coords((5,7),(5,7),(5,7))
 PNJTETE = tex_coords((6,9),(8,8),(8,8))
 PNJCORP = tex_coords((6,8),(6,8),(6,8))
+
+"""
 
 
 def normalize(position):
@@ -282,8 +299,8 @@ class Model(object):
 						self.remove_block(trajectoire[-1])
 						self.remove_block((trajectoire[-1][0],trajectoire[-1][1]+1,trajectoire[-1][2]))
 					dicopositiondesPNJ[PNJ]=0
-					self.add_block(trajectoire[0], PNJCORP)
-					self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), PNJTETE)
+					self.add_block(trajectoire[0], blocdisponibles["PNJCORP"])
+					self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["PNJTETE"])
 				else :
 					pos=dicopositiondesPNJ[PNJ]
 					if trajectoire[pos] in self.world and (trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]) in self.world:
@@ -291,8 +308,8 @@ class Model(object):
 						self.remove_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]))
 					dicopositiondesPNJ[PNJ]=dicopositiondesPNJ[PNJ]+1
 					pos=dicopositiondesPNJ[PNJ]
-					self.add_block(trajectoire[pos], PNJCORP)
-					self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), PNJTETE)
+					self.add_block(trajectoire[pos], blocdisponibles["PNJCORP"])
+					self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["PNJTETE"])
 			else:
 				self.incrementerPNJ(PNJ)
 
@@ -326,9 +343,9 @@ class Model(object):
 						self.biome_montagne(x,increment,z)
 				if hauteur <= 10:
 					for increment in xrange(0,hauteur,1):
-						self.add_block((x, increment , z), SAND, immediate=False)
+						self.add_block((x, increment , z), blocdisponibles["SAND"], immediate=False)
 					for increment in xrange(hauteur, 10, 1):
-						self.add_block((x, increment , z), WATER, immediate=False)
+						self.add_block((x, increment , z), blocdisponibles["WATER"], immediate=False)
 				if 10 < hauteur < 20:
 #                    if indexbiome == taillebiome:
 #                        taillebiome = 0
@@ -349,13 +366,13 @@ class Model(object):
 							self.biome_foret(x,hauteur,z)
 							indexbiome=indexbiome+1
 					for increment in xrange(0,hauteur-1,1):
-						self.add_block((x, increment , z), DIRT, immediate=False)
+						self.add_block((x, increment , z), blocdisponibles["DIRT"], immediate=False)
 #                self.add_block((x, y - 2, z), GRASS, immediate=False)
-				self.add_block((x, y - 3, z), STONE, immediate=False)
+				self.add_block((x, y - 3, z), blocdisponibles["STONE"], immediate=False)
 				if x in (-n, n) or z in (-n, n):
 					# create outer walls.
 					for dy in xrange(-2, 3):
-						self.add_block((x, y + dy, z), STONE, immediate=False)
+						self.add_block((x, y + dy, z), blocdisponibles["STONE"], immediate=False)
 		make_map()
 		hauteurdungeon=4
 		altitudedungeon=2
@@ -365,35 +382,35 @@ class Model(object):
 		for xdun in range(1,xmax-1):
 			for ydun in range(1,ymax-1):
 				if mapdungeon[xdun][ydun]==True:
-					self.add_block((xdun, altitudedungeon, ydun), STONED, immediate=False)
-					self.add_block((xdun, altitudedungeon+hauteurdungeon, ydun), STONED, immediate=False)
+					self.add_block((xdun, altitudedungeon, ydun), blocdisponibles["STONED"], immediate=False)
+					self.add_block((xdun, altitudedungeon+hauteurdungeon, ydun), blocdisponibles["STONED"], immediate=False)
 					for hdun in range(hauteurdungeon-1):
 						self.remove_block((xdun, altitudedungeon+hdun+1, ydun),immediate=False)
 				# OR est le ou non exclusif (xor pour le ou exclusif)
 				elif mapdungeon[xdun+1][ydun+1]==True: 
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun-1][ydun-1]==True:
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun+1][ydun-1]==True:
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun-1][ydun+1]==True: 
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun+1][ydun]==True: 
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun-1][ydun]==True: 
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun][ydun+1]==True: 
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 				elif mapdungeon[xdun][ydun-1]==True:
 					for hdun in range(hauteurdungeon):
-						self.add_block((xdun, altitudedungeon+hdun, ydun), STONED, immediate=False)
+						self.add_block((xdun, altitudedungeon+hdun, ydun), blocdisponibles["STONED"], immediate=False)
 		hauteuracces = int(snoise3(positiondebutdongeonx / freq, positiondebutdongeony / freq,graine, octaves,persistance) * 14.0 + 15.0)
 		for acces in range(altitudedungeon,hauteur):
 			self.remove_block((positiondebutdongeonx,acces,positiondebutdongeony))
@@ -419,25 +436,25 @@ class Model(object):
 
 
 	def biome_montagne(self,x,y,z):
-		self.add_block((x, y , z), STONED, immediate=False)
+		self.add_block((x, y , z), blocdisponibles["STONED"], immediate=False)
 		self.biomes[(x,y,z)]='MONTAGNE'
 		
 	def biome_plaine(self,x,y,z):
-		self.add_block((x, y-1 , z), GRASS, immediate=False)
+		self.add_block((x, y-1 , z), blocdisponibles["GRASS"], immediate=False)
 		if random.randint(1,250)==2:
-			self.add_block((x, y , z), BUISSON, immediate=False)
+			self.add_block((x, y , z), blocdisponibles["BUISSON"], immediate=False)
 		elif random.randint(1,10)==2:
-			self.add_block((x, y , z), FLOWER, immediate=False)
+			self.add_block((x, y , z), blocdisponibles["FLOWER"], immediate=False)
 		elif random.randint(1,250)==5:
 			self.arbre(x, y , z)
 		self.biomes[(x,y,z)]='PLAINE'
 	
 	def biome_foret(self,x,y,z):
-		self.add_block((x, y-1 , z), GRASS, immediate=False)
+		self.add_block((x, y-1 , z), blocdisponibles["GRASS"], immediate=False)
 		if random.randint(1,5)==2:
-			self.add_block((x, y , z), BUISSON, immediate=False)
+			self.add_block((x, y , z), blocdisponibles["BUISSON"], immediate=False)
 		elif random.randint(1,100)==2:
-			self.add_block((x, y , z), FLOWER, immediate=False)
+			self.add_block((x, y , z), blocdisponibles["FLOWER"], immediate=False)
 		elif random.randint(1,25)==5:
 			self.arbre(x, y , z)
 		self.biomes[(x,y,z)]='FORET'
@@ -448,18 +465,18 @@ class Model(object):
 		taillearbre=random.randint(5,10)
 		for i in xrange(0, taillearbre, 1):
 			if taillearbre > 8:
-				self.add_block((xo+1, i+yo , zo), TRONC, immediate=False)
-				self.add_block((xo+1, i+yo , zo+1), TRONC, immediate=False)
-				self.add_block((xo, i+yo , zo+1), TRONC, immediate=False)
-			self.add_block((xo, i+yo , zo), TRONC, immediate=False)
+				self.add_block((xo+1, i+yo , zo), blocdisponibles["TRONC"], immediate=False)
+				self.add_block((xo+1, i+yo , zo+1), blocdisponibles["TRONC"], immediate=False)
+				self.add_block((xo, i+yo , zo+1), blocdisponibles["TRONC"], immediate=False)
+			self.add_block((xo, i+yo , zo), blocdisponibles["TRONC"], immediate=False)
 		rayonfeuillage=random.randint(2,4)+int(taillearbre/3)
 		for y in xrange(yo-rayonfeuillage+taillearbre, yo+rayonfeuillage+taillearbre, 1):
 			for x in xrange(xo-rayonfeuillage,xo+rayonfeuillage , 1):
 				for z in xrange(zo-rayonfeuillage,zo+rayonfeuillage , 1):
 					if (y-yo)**2+(x-xo)**2+(z-zo)**2 < rayonfeuillage**2:
-						self.add_block((x, y+taillearbre-3, z), FEUILLAGE, immediate=False)
+						self.add_block((x, y+taillearbre-3, z), blocdisponibles["FEUILLAGE"], immediate=False)
 					if math.ceil((y-yo)**2+(x-xo)**2+(z-zo)**2) == rayonfeuillage**2 and random.randint(1,10)>8:
-						self.add_block((x, y+taillearbre-3, z), FEUILLAGE, immediate=False)
+						self.add_block((x, y+taillearbre-3, z), blocdisponibles["FEUILLAGE"], immediate=False)
 
 
 	"""
@@ -529,8 +546,8 @@ class Model(object):
 		for PNJ in dicoPNJ:
 			dicotrajectoirePNJ[PNJ]=generertrajectoire(PNJ)
 			temp=dicotrajectoirePNJ[PNJ]
-			self.add_block(temp[0], PNJCORP, immediate=False)
-			self.add_block((temp[0][0],temp[0][1]+1,temp[0][2]), PNJTETE, immediate=False)
+			self.add_block(temp[0], blocdisponibles["PNJCORP"], immediate=False)
+			self.add_block((temp[0][0],temp[0][1]+1,temp[0][2]), blocdisponibles["PNJTETE"], immediate=False)
 			dicopositiondesPNJ[PNJ]=0
 
 
@@ -591,7 +608,7 @@ class Model(object):
 		"""
 		x, y, z = position
 		for dx, dy, dz in FACES:
-			if ((x + dx, y + dy, z + dz) not in self.world) or (self.world[(x + dx, y + dy, z + dz)]==BUISSON) or (self.world[(x + dx, y + dy, z + dz)]==FLOWER): #mettre le non du bloc de petits blocs (voir en partie a travers)  
+			if ((x + dx, y + dy, z + dz) not in self.world) or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["BUISSON"]) or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["FLOWER"]): #mettre le non du bloc de petits blocs (voir en partie a travers)  
 				return True
 		return False
 
@@ -701,7 +718,7 @@ class Model(object):
 
 		"""
 		x, y, z = position
-		if texture == BUISSON :
+		if texture == blocdisponibles["BUISSON"] :
 			vertex_data = cube_vertices(x, y+0.1, z, 0.4)
 			texture_data = list(texture)
 			# create vertex list
@@ -710,13 +727,13 @@ class Model(object):
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
 			vertex_data = cube_vertices(x, y-0.4, z, 0.1)
-			texture_data = list(TRONC)
+			texture_data = list(blocdisponibles["TRONC"])
 			# create vertex list
 			# FIXME Maybe `add_indexed()` should be used instead
 			self._shown[(x,y+100,z)] = self.batch.add(24, GL_QUADS, self.group,
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
-		elif texture == FLOWER :
+		elif texture == blocdisponibles["FLOWER"] :
 			vertex_data = cube_vertices(x, y-0.1, z, 0.2)
 			texture_data = list(texture)
 			# create vertex list
@@ -725,7 +742,7 @@ class Model(object):
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
 			vertex_data = cube_vertices(x, y-0.4, z, 0.1)
-			texture_data = list(BUISSON)
+			texture_data = list(blocdisponibles["BUISSON"])
 			# create vertex list
 			# FIXME Maybe `add_indexed()` should be used instead
 			self._shown[(x,y+100,z)] = self.batch.add(24, GL_QUADS, self.group,
@@ -903,19 +920,27 @@ class Window(pyglet.window.Window):
 
 		# A list of blocks the player can place. Hit num keys to cycle.
 		# Il faudra pas mettre tous les blocs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.inventory = [BRICK, GRASS, SAND, WATER, STONED, BUISSON, DIRT,FLOWER, PNJTETE,PNJCORP,TRONC]
+		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER", "PNJTETE","PNJCORP","TRONC"]
 
 		#Qtite de chaque bloc ds l'inventaire. Il faudra changer les nom de variables
-		self.inventaire=[]
+		self.inventaire={}
 		for elt in self.inventory:
-			self.inventaire.append(0)
+			self.inventaire[elt]=0
 		
 		# a ameillorer pour le chargement et l'appartition
-		
-		
+		batchinventaire = pyglet.graphics.Batch()
+		sprites = []
 		self.blocs = pyglet.image.load('Donnees/Images/textureYOGSCAST-OS.png')
-		self.dirt = self.blocs.get_region(x=32*0, y=32*0, width=32, height=32)
-#		sprite=pyglet.sprite.Sprite(dirt)
+		absisse = 100
+		for elt in self.inventory:
+			
+			limage = self.blocs.get_region(x=32*0, y=32*0, width=32, height=32)
+			lesprite = pyglet.sprite.Sprite(img=limage,x=100,y=absisse, batch = batchinventaire)
+			sprites.append(lesprite)
+			absisse = absisse + 50
+		
+#		self.dirt = self.blocs.get_region(x=32*0, y=32*0, width=32, height=32)
+#		self.interfaceinventaire = pyglet.sprite.Sprite(img=self.dirt,x=100,y=100)
 		
 
 		# The current block the user can place. Hit num keys to cycle.
@@ -1126,7 +1151,7 @@ class Window(pyglet.window.Window):
 					op = list(np)
 					op[1] -= dy
 					op[i] += face[i]
-					if tuple(op) not in self.model.world or self.model.world[tuple(op)] == BUISSON or self.model.world[tuple(op)] == FLOWER: #Mettre le nom du bloc traversable par le joueur
+					if tuple(op) not in self.model.world or self.model.world[tuple(op)] == blocdisponibles["BUISSON"] or self.model.world[tuple(op)] == blocdisponibles["FLOWER"]: #Mettre le nom du bloc traversable par le joueur
 						continue
 					p[i] -= (d - pad) * face[i]
 					if face == (0, -1, 0) or face == (0, 1, 0):
@@ -1161,15 +1186,18 @@ class Window(pyglet.window.Window):
 				# ON OSX, control + left click = right click.
 				if previous:
 					if self.creative:
-						self.model.add_block(previous, self.block)
+						self.model.add_block(previous, blocdisponibles[self.block])
 					else :
-						if self.inventaire[self.inventory.index(self.block)] != 0:
-							self.model.add_block(previous, self.block)
-							self.inventaire[self.inventory.index(self.block)] = self.inventaire[self.inventory.index(self.block)] - 1
+						if self.inventaire[self.block] != 0:
+							self.model.add_block(previous, blocdisponibles[self.block])
+							self.inventaire[self.block] = self.inventaire[self.block] - 1
 			elif button == pyglet.window.mouse.LEFT and block:
 				texture = self.model.world[block]
-				if texture != STONE: # mettre ici les bloc indestructibles (ou faire un liste plus popre)
-					self.inventaire[self.inventory.index(self.model.world[block])] = self.inventaire[self.inventory.index(self.model.world[block])] + 1
+				if texture != blocdisponibles["STONE"]: # mettre ici les bloc indestructibles (ou faire un liste plus popre)
+					for clee,elt in blocdisponibles.items():
+						if elt == texture:
+							tex = clee
+					self.inventaire[tex] = self.inventaire[tex] + 1
 					self.model.remove_block(block)
 		else:
 			self.set_exclusive_mouse(True)
@@ -1336,8 +1364,8 @@ class Window(pyglet.window.Window):
 
 
 	def draw_inventaire(self):
-		self.dirt.blit(100,100)
-
+		pass
+#		self.interfaceinventaire.draw()
 
 
 	def draw_focused_block(self):
@@ -1429,6 +1457,7 @@ def main():
 
 def initialisations():
 	random.seed(graine)
+	chargeblocs("Donnees/blocs.bloc")
 
 
 
