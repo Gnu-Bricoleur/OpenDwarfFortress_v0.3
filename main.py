@@ -99,7 +99,8 @@ def chargeblocs(chemindacces):
 			l=ligne.split(",")
 			listelignes.append(l)
 	fichier.close()
-	for ligne in listelignes:
+	for ligne in listelignes:                    # Si on veut charger d'autre choses depuis le fichier il faut l'ajouter la !!
+		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]))
 		blocdisponibles[ligne[0]]=tex_coords((int(ligne[1]),int(ligne[2])),(int(ligne[3]),int(ligne[4])),(int(ligne[5]),int(ligne[6])))
 
 
@@ -928,16 +929,20 @@ class Window(pyglet.window.Window):
 			self.inventaire[elt]=0
 		
 		# a ameillorer pour le chargement et l'appartition
-		batchinventaire = pyglet.graphics.Batch()
-		sprites = []
+		self.batchinventaire = pyglet.graphics.Batch()
+		self.sprites = {}
 		self.blocs = pyglet.image.load('Donnees/Images/textureYOGSCAST-OS.png')
-		absisse = 100
 		for elt in self.inventory:
+			coordonee = blocscharge[elt]
+			limage = self.blocs.get_region(x=32*coordonee[2], y=32*coordonee[3], width=32, height=32)
+			self.sprites[elt]=limage
 			
+			"""
 			limage = self.blocs.get_region(x=32*0, y=32*0, width=32, height=32)
 			lesprite = pyglet.sprite.Sprite(img=limage,x=100,y=absisse, batch = batchinventaire)
 			sprites.append(lesprite)
 			absisse = absisse + 50
+			"""
 		
 #		self.dirt = self.blocs.get_region(x=32*0, y=32*0, width=32, height=32)
 #		self.interfaceinventaire = pyglet.sprite.Sprite(img=self.dirt,x=100,y=100)
@@ -972,6 +977,21 @@ class Window(pyglet.window.Window):
 		# TICKS_PER_SEC. This is the main game event loop.
 		pyglet.clock.schedule_interval(self.update, 1.0 / TICKS_PER_SEC)
 		pyglet.clock.schedule_interval(self.appelerdeplacerPNJ, 1.0)
+
+
+	def draw_inventaire(self):
+		spritesaffiche = []
+		dessener = []
+		absisse = 50
+		for elt in self.inventaire:
+			if self.inventaire[elt] != 0:
+				spritesaffiche.append(self.sprites[elt])
+		for sprt in spritesaffiche:
+			dessener.append(pyglet.sprite.Sprite(img=sprt,x=100,y=absisse, batch = self.batchinventaire))
+			absisse = absisse + 50
+		self.batchinventaire.draw()
+
+
 
 
 
@@ -1362,10 +1382,6 @@ class Window(pyglet.window.Window):
 		self.draw_reticle()
 		self.draw_inventaire()
 
-
-	def draw_inventaire(self):
-		pass
-#		self.interfaceinventaire.draw()
 
 
 	def draw_focused_block(self):

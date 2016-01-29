@@ -61,7 +61,7 @@ mapdungeon = [[ False
 				for x in range(MAP_WIDTH) ]
 
 blocdisponibles={}
-
+blocscharge = {}
 
 TEXTURE_PATH = 'Donnees/Images/textureYOGSCAST-OS.png'
 
