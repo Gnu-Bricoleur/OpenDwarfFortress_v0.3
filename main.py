@@ -100,7 +100,7 @@ def chargeblocs(chemindacces):
 			listelignes.append(l)
 	fichier.close()
 	for ligne in listelignes:                    # Si on veut charger d'autre choses depuis le fichier il faut l'ajouter la !!
-		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]))
+		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]),int(ligne[7]))
 		blocdisponibles[ligne[0]]=tex_coords((int(ligne[1]),int(ligne[2])),(int(ligne[3]),int(ligne[4])),(int(ligne[5]),int(ligne[6])))
 
 
@@ -241,7 +241,8 @@ class Model(object):
 		self.batch = pyglet.graphics.Batch()
 
 		# A TextureGroup manages an OpenGL texture.
-		self.group = TextureGroup(image.load(TEXTURE_PATH).get_texture())
+		self.group = TextureGroup(image.load(TEXTURE_PATH1).get_texture())
+		self.group2 = TextureGroup(image.load(TEXTURE_PATH2).get_texture())
 
 		# A mapping from position to the texture of the block at that position.
 		# This defines all the blocks that are currently in the world.
@@ -300,8 +301,8 @@ class Model(object):
 						self.remove_block(trajectoire[-1])
 						self.remove_block((trajectoire[-1][0],trajectoire[-1][1]+1,trajectoire[-1][2]))
 					dicopositiondesPNJ[PNJ]=0
-					self.add_block(trajectoire[0], blocdisponibles["PNJCORP"])
-					self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["PNJTETE"])
+					self.add_block(trajectoire[0], blocdisponibles["ZOMBIECORP"])
+					self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["ZOMBIETETE"])
 				else :
 					pos=dicopositiondesPNJ[PNJ]
 					if trajectoire[pos] in self.world and (trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]) in self.world:
@@ -309,8 +310,8 @@ class Model(object):
 						self.remove_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]))
 					dicopositiondesPNJ[PNJ]=dicopositiondesPNJ[PNJ]+1
 					pos=dicopositiondesPNJ[PNJ]
-					self.add_block(trajectoire[pos], blocdisponibles["PNJCORP"])
-					self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["PNJTETE"])
+					self.add_block(trajectoire[pos], blocdisponibles["ZOMBIECORP"])
+					self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["ZOMBIETETE"])
 			else:
 				self.incrementerPNJ(PNJ)
 
@@ -415,13 +416,66 @@ class Model(object):
 		hauteuracces = int(snoise3(positiondebutdongeonx / freq, positiondebutdongeony / freq,graine, octaves,persistance) * 14.0 + 15.0)
 		for acces in range(altitudedungeon,hauteur):
 			self.remove_block((positiondebutdongeonx,acces,positiondebutdongeony))
-		entre=self.loadmodeleenregistre('maison')
+		entre=self.loadmodeleenregistre('maisondongeon')
 		for elements in entre:
 			self.add_block((elements[0]+positiondebutdongeonx,elements[1]+hauteuracces,elements[2]+positiondebutdongeony), entre[elements], immediate=False)
+		self.poserville(random.randint(-UNDEMILARGEURLONGUEURDUMONDE,UNDEMILARGEURLONGUEURDUMONDE),random.randint(-UNDEMILARGEURLONGUEURDUMONDE,UNDEMILARGEURLONGUEURDUMONDE))
+
+
+
+	def poserville(self,decax,decay):
+		nombredemaisonmax=random.randint(10,20)
+		tailleville=30
+		decax=decax-tailleville
+		decay=decay-tailleville
+		freq = 16.0 * octaves
+		carte=[]
+		cartey=[]
+		listemaison=[]
+		coordmaison=[]
+		for x in range(tailleville):
+			for y in range(tailleville):
+				cartey.append(False)
+			carte.append(cartey)
+		# creer route principale
+		for x in range(tailleville):
+			carte[x][15]=True
+			carte[x][14]=True
+			if random.randint(1,3)==1:
+				carte[x][13]=True
+			if random.randint(1,3)==1:
+				carte[x][16]=True
+			if random.randint(1,6)==1:
+				carte[x][17]=True
+			if random.randint(1,6)==1:
+				carte[x][12]=True
+			route=Rect(0,14,2,15)
+			listemaison.append(route)
+		# creer maison
+		for x in range(nombredemaisonmax):
+			posx=random.randint(0,30)
+			posy=random.randint(0,30)
+			maison=Rect(posx,posy,5,5)
+			failed = False
+			for other_maison in listemaison:
+				if maison.intersect(other_maison):
+					failed = True
+			if not failed:
+				listemaison.append(maison)
+				coordmaison.append((posx+decax,posy+decay))
+				pointdepassagevillageoismaison.append((posx+decax,posy+decay))
+		modelemaison = self.loadmodeleenregistre('maisondebase')
+		for coordonne in coordmaison:
+			hauteur = int(snoise3(coordonne[0] / freq, coordonne[1] / freq,graine, octaves,persistance) * 14.0 + 15.0)
+			for elements in modelemaison:
+				self.add_block((elements[0]+coordonne[0],elements[1]+hauteur,elements[2]+coordonne[1]), modelemaison[elements], immediate=False)
+
+
+
 
 
 	def loadmodeleenregistre(self,nomModele):
-		nom='Sauvegardes/MesModeles/'+nomModele+'.p'
+		nom='Donnees/Modeles/'+nomModele+'.p'
 		dico=pickle.load(file(nom))
 		return dico
 
@@ -547,8 +601,8 @@ class Model(object):
 		for PNJ in dicoPNJ:
 			dicotrajectoirePNJ[PNJ]=generertrajectoire(PNJ)
 			temp=dicotrajectoirePNJ[PNJ]
-			self.add_block(temp[0], blocdisponibles["PNJCORP"], immediate=False)
-			self.add_block((temp[0][0],temp[0][1]+1,temp[0][2]), blocdisponibles["PNJTETE"], immediate=False)
+			self.add_block(temp[0], blocdisponibles["ZOMBIECORP"], immediate=False)
+			self.add_block((temp[0][0],temp[0][1]+1,temp[0][2]), blocdisponibles["ZOMBIETETE"], immediate=False)
 			dicopositiondesPNJ[PNJ]=0
 
 
@@ -613,6 +667,9 @@ class Model(object):
 				return True
 		return False
 
+
+
+
 	def add_block(self, position, texture, immediate=True):
 		global positionpremierbloc
 		
@@ -630,10 +687,11 @@ class Model(object):
 
 		"""
 		if enregistrementdemodele == True:
-			if modeleenenregistrement == {}:
+			if modeleenenregistrement == {} and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"]:
 				positionpremierbloc=position
+		if texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"]:
 			modeleenenregistrement[(position[0]-positionpremierbloc[0],position[1]-positionpremierbloc[1],position[2]-positionpremierbloc[2])]=texture
-		modifsasauvegarder[position]=texture
+			modifsasauvegarder[position]=texture
 		if position in self.world:
 			self.remove_block(position, immediate)
 		self.world[position] = texture
@@ -747,6 +805,14 @@ class Model(object):
 			# create vertex list
 			# FIXME Maybe `add_indexed()` should be used instead
 			self._shown[(x,y+100,z)] = self.batch.add(24, GL_QUADS, self.group,
+				('v3f/static', vertex_data),
+				('t2f/static', texture_data))
+		elif texture == blocdisponibles["PNJTETE"] or texture == blocdisponibles["PNJCORP"] or texture == blocdisponibles["ZOMBIECORP"] or texture == blocdisponibles["ZOMBIETETE"] :# Mettre une liste plus propre
+			vertex_data = cube_vertices(x, y, z, 0.5)
+			texture_data = list(texture)
+			# create vertex list
+			# FIXME Maybe `add_indexed()` should be used instead
+			self._shown[position] = self.batch.add(24, GL_QUADS, self.group2,
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
 		else :
@@ -921,7 +987,7 @@ class Window(pyglet.window.Window):
 
 		# A list of blocks the player can place. Hit num keys to cycle.
 		# Il faudra pas mettre tous les blocs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER", "PNJTETE","PNJCORP","TRONC"]
+		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER","TRONC","WOOD"]
 
 		#Qtite de chaque bloc ds l'inventaire. Il faudra changer les nom de variables
 		self.inventaire={}
@@ -983,14 +1049,25 @@ class Window(pyglet.window.Window):
 		spritesaffiche = []
 		dessener = []
 		absisse = 50
+		blocselec = -1
 		for elt in self.inventaire:
-			if self.inventaire[elt] != 0:
+			if self.creative == True:
 				spritesaffiche.append(self.sprites[elt])
+				if elt == self.block:
+					blocselec=len(spritesaffiche)
+			else:
+				if self.inventaire[elt] != 0 and elt == self.block:
+					spritesaffiche.append(self.sprites[elt])
+					blocselec=len(spritesaffiche)
+				elif self.inventaire[elt] != 0 :
+					spritesaffiche.append(self.sprites[elt])
 		for sprt in spritesaffiche:
-			dessener.append(pyglet.sprite.Sprite(img=sprt,x=100,y=absisse, batch = self.batchinventaire))
+			if spritesaffiche.index(sprt) + 1 == blocselec:
+				dessener.append(pyglet.sprite.Sprite(img=sprt,x=120,y=absisse, batch = self.batchinventaire))
+			else:
+				dessener.append(pyglet.sprite.Sprite(img=sprt,x=100,y=absisse, batch = self.batchinventaire))
 			absisse = absisse + 50
 		self.batchinventaire.draw()
-
 
 
 
@@ -1217,10 +1294,12 @@ class Window(pyglet.window.Window):
 					for clee,elt in blocdisponibles.items():
 						if elt == texture:
 							tex = clee
-					self.inventaire[tex] = self.inventaire[tex] + 1
+					if tex in self.inventaire:
+						self.inventaire[tex] = self.inventaire[tex] + 1
 					self.model.remove_block(block)
 		else:
 			self.set_exclusive_mouse(True)
+
 
 	def on_mouse_motion(self, x, y, dx, dy):
 		""" Called when the player moves the mouse.
@@ -1301,6 +1380,23 @@ class Window(pyglet.window.Window):
 		elif symbol in self.num_keys:
 			index = (symbol - self.num_keys[0]) % len(self.inventory)
 			self.block = self.inventory[index]
+
+
+
+	def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+		clee = self.inventory.index(self.block)
+		index = (clee+scroll_y) % len(self.inventory)
+		self.block = self.inventory[index]
+
+
+
+	def dicoinverse(self, dic, valeur): # A utilise avec precaution
+		for clee in dic:
+			if dic[clee] == valeur:
+				return clee
+		return 0
+
+
 
 	def on_key_release(self, symbol, modifiers):
 		""" Called when the player releases a key. See pyglet docs for key

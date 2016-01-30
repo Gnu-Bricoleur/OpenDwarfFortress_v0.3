@@ -63,10 +63,10 @@ mapdungeon = [[ False
 blocdisponibles={}
 blocscharge = {}
 
-TEXTURE_PATH = 'Donnees/Images/textureYOGSCAST-OS.png'
+TEXTURE_PATH1 = 'Donnees/Images/textureYOGSCAST-OS.png'
 
-
-
+TEXTURE_PATH2 = 'Donnees/Images/PNJ.png'
+pointdepassagevillageoismaison=[]
 
 
 

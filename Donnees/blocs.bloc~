@@ -1,6 +1,7 @@
 #Ligne de commentaire ignorée par ODF
+#ATTENTION A NE PAS LAISSER DE LIGNES VIDES A LA FIN DU FICHIER
 #fichier au format csv
-#bloc,coord top ,bottom,side,nom, coord miniature, description
+#bloc,coord top ,bottom,side,nom, coord miniature,description,destructible,traversable,....
 GRASS,0,15,2,15,3,15,truc
 SAND,2,14,2,14,2,14,truc
 BRICK,7,15,7,15,7,15,truc
@@ -14,3 +15,5 @@ TRONC,5,14,5,14,4,14,truc
 FEUILLAGE,5,7,5,7,5,7,truc
 PNJTETE,6,9,8,8,8,8,truc
 PNJCORP,6,8,6,8,6,8,truc
+WOOD,4,15,4,15,4,15,truc
+#ATTENTION A NE PAS LAISSER DE LIGNES VIDES A LA FIN DU FICHIER
