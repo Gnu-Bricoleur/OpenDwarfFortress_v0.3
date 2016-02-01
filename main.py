@@ -577,6 +577,17 @@ class Model(object):
 						x=random.randint(-UNDEMILARGEURLONGUEURDUMONDE-5,UNDEMILARGEURLONGUEURDUMONDE-5)
 				listptsdepassage.append((x,y))
 			dicoPNJ[iterat]=listptsdepassage
+		nbrdePNJv = random.randint(10,20)
+		nbrdeptsdepassagev = random.randint(3,7)
+		for iterat in range(nbrdePNJ, nbrdePNJ+nbrdePNJv):
+			listptsdepassagev=[]
+			for itera in range(nbrdeptsdepassagev):
+				ptsv=random.randint(0,len(pointdepassagevillageoismaison)-1)
+				if listptsdepassagev != []:
+					while listptsdepassagev[-1] == pointdepassagevillageoismaison[ptsv] or listptsdepassagev[-1][0] == pointdepassagevillageoismaison[ptsv][0] or listptsdepassage[0][0] == pointdepassagevillageoismaison[ptsv][0]:
+						ptsv=random.randint(0,len(pointdepassagevillageoismaison)-1)
+				listptsdepassagev.append(pointdepassagevillageoismaison[ptsv])
+			dicoPNJ[iterat]=listptsdepassagev
 
 
 
