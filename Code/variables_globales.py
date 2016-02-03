@@ -60,9 +60,13 @@ mapdungeon = [[ False
 			for y in range(MAP_HEIGHT) ]
 				for x in range(MAP_WIDTH) ]
 
+
+dicoBiome = {}
+
+
 blocdisponibles={}
 blocscharge = {}
-
+texturePNJ = {}
 TEXTURE_PATH1 = 'Donnees/Images/textureYOGSCAST-OS.png'
 
 TEXTURE_PATH2 = 'Donnees/Images/PNJ.png'

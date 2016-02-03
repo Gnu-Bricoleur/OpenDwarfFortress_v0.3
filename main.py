@@ -142,8 +142,12 @@ def normalize(position):
 
 def equadedroite(x1,y1,x2,y2):
 	#renvois le a et le b de y=ax+b
-	a=(y2-y1)/(x2-x1)
-	b=y1-(a*x1)
+	if x2-x1 != 0:
+		a=(y2-y1)/(x2-x1)
+		b=y1-(a*x1)
+	else :
+		a = 10000
+		b=y1-(a*x1)
 	return a,b
 
 
@@ -301,8 +305,12 @@ class Model(object):
 						self.remove_block(trajectoire[-1])
 						self.remove_block((trajectoire[-1][0],trajectoire[-1][1]+1,trajectoire[-1][2]))
 					dicopositiondesPNJ[PNJ]=0
-					self.add_block(trajectoire[0], blocdisponibles["ZOMBIECORP"])
-					self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["ZOMBIETETE"])
+					if texturePNJ[PNJ] == "zombie":
+						self.add_block(trajectoire[0], blocdisponibles["ZOMBIECORP"])
+						self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["ZOMBIETETE"])
+					else :
+						self.add_block(trajectoire[0], blocdisponibles["PNJCORP"])
+						self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["PNJTETE"])
 				else :
 					pos=dicopositiondesPNJ[PNJ]
 					if trajectoire[pos] in self.world and (trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]) in self.world:
@@ -310,8 +318,12 @@ class Model(object):
 						self.remove_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]))
 					dicopositiondesPNJ[PNJ]=dicopositiondesPNJ[PNJ]+1
 					pos=dicopositiondesPNJ[PNJ]
-					self.add_block(trajectoire[pos], blocdisponibles["ZOMBIECORP"])
-					self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["ZOMBIETETE"])
+					if texturePNJ[PNJ] == "zombie":
+						self.add_block(trajectoire[pos], blocdisponibles["ZOMBIECORP"])
+						self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["ZOMBIETETE"])
+					else :
+						self.add_block(trajectoire[pos], blocdisponibles["PNJCORP"])
+						self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["PNJTETE"])
 			else:
 				self.incrementerPNJ(PNJ)
 
@@ -322,6 +334,19 @@ class Model(object):
 			dicopositiondesPNJ[PNJ]=0
 		else:
 			dicopositiondesPNJ[PNJ]=dicopositiondesPNJ[PNJ]+1
+
+
+
+	def pasdeau(self,posx,posy,larlong):
+		resultat = True
+		for x in range(posx-larlong,posx):
+			for y in range(posy-larlong,posy):
+				if (x,y) in dicoBiome:
+					if dicoBiome[(x,y)] == "EAU":
+						return False
+		return True
+
+
 
 
 	def creer_monde(self):
@@ -344,6 +369,7 @@ class Model(object):
 					for increment in xrange(0,hauteur,1):
 						self.biome_montagne(x,increment,z)
 				if hauteur <= 10:
+					dicoBiome[(x,z)] = "EAU"
 					for increment in xrange(0,hauteur,1):
 						self.add_block((x, increment , z), blocdisponibles["SAND"], immediate=False)
 					for increment in xrange(hauteur, 10, 1):
@@ -419,13 +445,21 @@ class Model(object):
 		entre=self.loadmodeleenregistre('maisondongeon')
 		for elements in entre:
 			self.add_block((elements[0]+positiondebutdongeonx,elements[1]+hauteuracces,elements[2]+positiondebutdongeony), entre[elements], immediate=False)
-		self.poserville(random.randint(-UNDEMILARGEURLONGUEURDUMONDE,UNDEMILARGEURLONGUEURDUMONDE),random.randint(-UNDEMILARGEURLONGUEURDUMONDE,UNDEMILARGEURLONGUEURDUMONDE))
+		tailleville=20
+		posvillex = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
+		posvilley = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
+		while self.pasdeau(posvillex,posvilley, tailleville) != True :
+			posvillex = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
+			posvilley = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
+		self.poserville(posvillex,posvilley, tailleville)
 
 
 
-	def poserville(self,decax,decay):
-		nombredemaisonmax=random.randint(10,20)
-		tailleville=30
+
+
+
+	def poserville(self,decax,decay,tailleville):
+		nombredemaisonmax=random.randint(20,30)
 		decax=decax-tailleville
 		decay=decay-tailleville
 		freq = 16.0 * octaves
@@ -465,10 +499,22 @@ class Model(object):
 				coordmaison.append((posx+decax,posy+decay))
 				pointdepassagevillageoismaison.append((posx+decax,posy+decay))
 		modelemaison = self.loadmodeleenregistre('maisondebase')
+		taillemodelex, taillemodeley = 0,0
+		for elements in modelemaison:
+			if elements[1]==0:
+				if elements[0] > taillemodelex:
+					taillemodelex == elements[0]
+				if elements[2] > taillemodeley:
+					taillemodeley == elements[2]
 		for coordonne in coordmaison:
-			hauteur = int(snoise3(coordonne[0] / freq, coordonne[1] / freq,graine, octaves,persistance) * 14.0 + 15.0)
+			hauteurmin = int(snoise3(coordonne[0] / freq, coordonne[1] / freq,graine, octaves,persistance) * 14.0 + 15.0)
+			for x in range(coordonne[0],coordonne[0]+taillemodelex):
+				for y in range(coordonne[2],coordonne[2]+taillemodeley):
+					hauteur = int(snoise3(x / freq, y / freq,graine, octaves,persistance) * 14.0 + 15.0)
+					if hauteur < hauteurmin:
+						hauteurmin = hauteur
 			for elements in modelemaison:
-				self.add_block((elements[0]+coordonne[0],elements[1]+hauteur,elements[2]+coordonne[1]), modelemaison[elements], immediate=False)
+				self.add_block((elements[0]+coordonne[0],elements[1]+hauteurmin,elements[2]+coordonne[1]), modelemaison[elements], immediate=False)
 
 
 
@@ -577,6 +623,7 @@ class Model(object):
 						x=random.randint(-UNDEMILARGEURLONGUEURDUMONDE-5,UNDEMILARGEURLONGUEURDUMONDE-5)
 				listptsdepassage.append((x,y))
 			dicoPNJ[iterat]=listptsdepassage
+			texturePNJ[iterat]="zombie"
 		nbrdePNJv = random.randint(10,20)
 		nbrdeptsdepassagev = random.randint(3,7)
 		for iterat in range(nbrdePNJ, nbrdePNJ+nbrdePNJv):
@@ -588,6 +635,7 @@ class Model(object):
 						ptsv=random.randint(0,len(pointdepassagevillageoismaison)-1)
 				listptsdepassagev.append(pointdepassagevillageoismaison[ptsv])
 			dicoPNJ[iterat]=listptsdepassagev
+			texturePNJ[iterat]="villageois"
 
 
 
