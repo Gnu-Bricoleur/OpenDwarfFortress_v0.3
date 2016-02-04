@@ -506,6 +506,10 @@ class Model(object):
 					taillemodelex == elements[0]
 				if elements[2] > taillemodeley:
 					taillemodeley == elements[2]
+		if taillemodelex < 0:
+			taillemodelex = - taillemodelex
+		if taillemodeley < 0:
+			taillemodely = - taillemodeley
 		for coordonne in coordmaison:
 			hauteurmin = int(snoise3(coordonne[0] / freq, coordonne[1] / freq,graine, octaves,persistance) * 14.0 + 15.0)
 			for x in range(coordonne[0],coordonne[0]+taillemodelex):
