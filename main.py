@@ -1000,7 +1000,7 @@ class Model(object):
 
 class Window(pyglet.window.Window):
 
-
+	global texteselec
 	global enregistrementdemodele
 
 	def __init__(self, *args, **kwargs):
@@ -1014,6 +1014,9 @@ class Window(pyglet.window.Window):
 
 		# Creative mode (bloc illimite)
 		self.creative = False
+
+		# possibilite de taper du texte (reirige les evenements claviers) !!!!!!!!!!!!!!!!!!!!!!!!!! Faudra peut etre bloquer les deplacement des zombis ou ennemis
+		self.tapetexte = False
 
 		# Strafing is moving lateral to the direction you are facing,
 		# e.g. moving to the left or right while continuing to face forward.
@@ -1345,12 +1348,16 @@ class Window(pyglet.window.Window):
 					((button == mouse.LEFT) and (modifiers & key.MOD_CTRL)):
 				# ON OSX, control + left click = right click.
 				if previous:
-					if self.creative:
-						self.model.add_block(previous, blocdisponibles[self.block])
+					if self.model.world[block] == blocdisponibles["PNJTETE"] or self.model.world[block] == blocdisponibles["ZOMBIETETE"] :# Mettre liste onpeut causer
+						self.tapetexte = True
+						self.questions()
 					else :
-						if self.inventaire[self.block] != 0:
+						if self.creative:
 							self.model.add_block(previous, blocdisponibles[self.block])
-							self.inventaire[self.block] = self.inventaire[self.block] - 1
+						else :
+							if self.inventaire[self.block] != 0:
+								self.model.add_block(previous, blocdisponibles[self.block])
+								self.inventaire[self.block] = self.inventaire[self.block] - 1
 			elif button == pyglet.window.mouse.LEFT and block:
 				texture = self.model.world[block]
 				if texture != blocdisponibles["STONE"]: # mettre ici les bloc indestructibles (ou faire un liste plus popre)
@@ -1407,43 +1414,151 @@ class Window(pyglet.window.Window):
 
 		"""
 		global enregistrementdemodele
-		if symbol == key.Z:
-			self.strafe[0] -= 1
-		elif symbol == key.S:
-			self.strafe[0] += 1
-		elif symbol == key.Q:
-			self.strafe[1] -= 1
-		elif symbol == key.D:
-			self.strafe[1] += 1
-		elif symbol == key.C:
-			nomcapture='Sauvegardes/Captures/'+str(graine)+'-'+str(time.time())+'.png'
-			pyglet.image.get_buffer_manager().get_color_buffer().save(nomcapture)
-		elif symbol == key.W:
-#			sauvegarde = 1
-			self.model.save()
-#			picklableMethod = MethodProxy(Model, Model.model)
-#			cpickle.dump( picklableMethod, open( "Sauvegardes/saveWorld.p", "wb" ) )
-		elif symbol == key.N:
-			if enregistrementdemodele == False:
-				enregistrementdemodele = True
-			else :
-				enregistrementdemodele = False
-				positionpremierbloc=(0,0,0)
-				pickle.dump( modeleenenregistrement, open( "Sauvegardes/MesModeles/modele.p", "wb" ) )
-				modeleenenregistrement={}
-		elif symbol == key.SPACE:
-			if self.dy == 0:
-				self.dy = JUMP_SPEED
-		elif symbol == key.ESCAPE:
-			self.set_exclusive_mouse(False)
-		elif symbol == key.TAB:
-			self.flying = not self.flying
-		elif symbol == key.B:
-			self.creative = not self.creative
-		elif symbol in self.num_keys:
-			index = (symbol - self.num_keys[0]) % len(self.inventory)
-			self.block = self.inventory[index]
+		global textetape
+		global texteselec
+		if self.tapetexte == False :
+			if symbol == key.Z:
+				self.strafe[0] -= 1
+			elif symbol == key.S:
+				self.strafe[0] += 1
+			elif symbol == key.Q:
+				self.strafe[1] -= 1
+			elif symbol == key.D:
+				self.strafe[1] += 1
+			elif symbol == key.C:
+				nomcapture='Sauvegardes/Captures/'+str(graine)+'-'+str(time.time())+'.png'
+				pyglet.image.get_buffer_manager().get_color_buffer().save(nomcapture)
+			elif symbol == key.W:
+	#			sauvegarde = 1
+				self.model.save()
+	#			picklableMethod = MethodProxy(Model, Model.model)
+	#			cpickle.dump( picklableMethod, open( "Sauvegardes/saveWorld.p", "wb" ) )
+			elif symbol == key.N:
+				if enregistrementdemodele == False:
+					enregistrementdemodele = True
+				else :
+					enregistrementdemodele = False
+					positionpremierbloc=(0,0,0)
+					pickle.dump( modeleenenregistrement, open( "Sauvegardes/MesModeles/modele.p", "wb" ) )
+					modeleenenregistrement={}
+			elif symbol == key.SPACE:
+				if self.dy == 0:
+					self.dy = JUMP_SPEED
+			elif symbol == key.ESCAPE:
+				self.set_exclusive_mouse(False)
+			elif symbol == key.TAB:
+				self.flying = not self.flying
+			elif symbol == key.B:
+				self.creative = not self.creative
+			elif symbol in self.num_keys:
+				index = (symbol - self.num_keys[0]) % len(self.inventory)
+				self.block = self.inventory[index]
+		else :
+			self.strafe[0],self.strafe[1]=0,0
+			if symbol == key.ENTER:
+				print textetape
+				flagTexteaetetape = True
+				self.discuter()
+#				self.tapetexte = not self.tapetexte
+				textetape = ""
+			elif symbol == key.ESCAPE:
+				self.set_exclusive_mouse(False)
+			elif symbol == key.RIGHT:
+				self.tapetexte = False
+			elif symbol == key.A:
+				textetape = textetape + "a"
+			elif symbol == key.B:
+				textetape = textetape + "b"
+			elif symbol == key.C:
+				textetape = textetape + "c"
+			elif symbol == key.D:
+				textetape = textetape + "d"
+			elif symbol == key.E:
+				textetape = textetape + "e"
+			elif symbol == key.F:
+				textetape = textetape + "f"
+			elif symbol == key.G:
+				textetape = textetape + "g"
+			elif symbol == key.H:
+				textetape = textetape + "h"
+			elif symbol == key.I:
+				textetape = textetape + "i"
+			elif symbol == key.J:
+				textetape = textetape + "j"
+			elif symbol == key.K:
+				textetape = textetape + "k"
+			elif symbol == key.L:
+				textetape = textetape + "l"
+			elif symbol == key.M:
+				textetape = textetape + "m"
+			elif symbol == key.N:
+				textetape = textetape + "n"
+			elif symbol == key.O:
+				textetape = textetape + "o"
+			elif symbol == key.P:
+				textetape = textetape + "p"
+			elif symbol == key.Q:
+				textetape = textetape + "q"
+			elif symbol == key.R:
+				textetape = textetape + "r"
+			elif symbol == key.S:
+				textetape = textetape + "s"
+			elif symbol == key.T:
+				textetape = textetape + "t"
+			elif symbol == key.U:
+				textetape = textetape + "u"
+			elif symbol == key.V:
+				textetape = textetape + "v"
+			elif symbol == key.W:
+				textetape = textetape + "w"
+			elif symbol == key.X:
+				textetape = textetape + "x"
+			elif symbol == key.Y:
+				textetape = textetape + "y"
+			elif symbol == key.Z:
+				textetape = textetape + "z"
+			elif symbol == key.DOWN:
+				texteselec = 1
+			elif symbol == key.UP:
+				texteselec = 0
 
+
+	def questions(self):
+		global aafficher
+		aafficher = []
+		for elt in textdesquestions:
+			aafficher.append(elt)
+
+
+
+	def discuter(self):
+		global aafficher
+		global texteselec
+		global textetape
+		if texteselec != -1:
+			aafficher = []
+			aafficher.append(textdesreponses[texteselec])
+			texteselec = -1
+		elif textetape != "":
+			print "recherche"
+			aaficher = []
+			for elt in textdesreponses:
+				if textetape in elt:
+					aafficher.append(elt)
+			if aafficher == []:
+				aafficher.append(textdesreponses[-1])
+		else:
+			self.tapetexte = False
+
+	def draw_discution(self):
+		global aafficher
+		for elt in aafficher:
+			label = pyglet.text.Label(elt,
+				font_name='Times New Roman',
+				font_size=20,
+				x=400,y= 100 - aafficher.index(elt)*20,
+				anchor_x='center', anchor_y='center')
+			label.draw()
 
 
 	def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
@@ -1473,14 +1588,15 @@ class Window(pyglet.window.Window):
 			Number representing any modifying keys that were pressed.
 
 		"""
-		if symbol == key.Z:
-			self.strafe[0] += 1
-		elif symbol == key.S:
-			self.strafe[0] -= 1
-		elif symbol == key.Q:
-			self.strafe[1] += 1
-		elif symbol == key.D:
-			self.strafe[1] -= 1
+		if self.tapetexte == False :
+			if symbol == key.Z:
+				self.strafe[0] += 1
+			elif symbol == key.S:
+				self.strafe[0] -= 1
+			elif symbol == key.Q:
+				self.strafe[1] += 1
+			elif symbol == key.D:
+				self.strafe[1] -= 1
 
 	def on_resize(self, width, height):
 		""" Called when the window is resized to a new `width` and `height`.
@@ -1540,6 +1656,8 @@ class Window(pyglet.window.Window):
 		self.draw_label()
 		self.draw_reticle()
 		self.draw_inventaire()
+		if self.tapetexte == True:
+			self.draw_discution()
 
 
 

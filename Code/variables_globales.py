@@ -60,10 +60,12 @@ mapdungeon = [[ False
 			for y in range(MAP_HEIGHT) ]
 				for x in range(MAP_WIDTH) ]
 
+onpeutdiscuter = ["PNJTETE","PNJCORP","ZOMBIETETE","ZOMBIECORP"]
 
 dicoBiome = {}
-
-
+textdesquestions = ["[HAUT] Quel est ce village","[BAS] Sais-tu ou est le gouffre de Hraaa","[RIGHT] Au revoir"]
+textdesreponses = ["C'est le village de Troupaumee bien sur, d'ou viens tu pour ne pas savoir ca ?","Je crois que le gouffre de Hraaa se situe plus a l'est","Salut","Qu'est ce que vous avez tous a me demander des quetes","Je ne suis pas sur d'avoir bien entendu"]
+aafficher = []
 blocdisponibles={}
 blocscharge = {}
 texturePNJ = {}
@@ -71,9 +73,9 @@ TEXTURE_PATH1 = 'Donnees/Images/textureYOGSCAST-OS.png'
 
 TEXTURE_PATH2 = 'Donnees/Images/PNJ.png'
 pointdepassagevillageoismaison=[]
-
-
-
+texteselec = -1
+textetape = ""
+flagTexteaetetape = False
 
 FACES = [
 	( 0, 1, 0),
