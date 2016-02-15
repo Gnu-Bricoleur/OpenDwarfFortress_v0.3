@@ -302,3 +302,4 @@ def make_map():
 			#finally, append the new room to the list
 			rooms.append(new_room)
 			num_rooms += 1
+	return positiondebutdongeonx,positiondebutdongeony,

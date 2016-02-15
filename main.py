@@ -36,6 +36,15 @@ from pyglet.window import key, mouse
 
 
 
+def ext_add_block(model,position,block,immedia):
+	model.add_block(position,block,immedia)
+
+
+
+def testextaddblock(model):
+	for z in range(0,100):
+		ext_add_block(model,(0,z,0),blocdisponibles["SAND"],False)
+
 
 class Model(object):
 	global modifsasauvegarder
@@ -155,7 +164,7 @@ class Model(object):
 
 	def creer_monde(self):
 		global mapdungeon
-		global positiondebutdongeonx,positiondebutdongeony
+#		global positiondebutdongeonx,positiondebutdongeony
 		freq = 16.0 * octaves
 		increment=0
 		hauteur=0
@@ -205,7 +214,7 @@ class Model(object):
 					# create outer walls.
 					for dy in xrange(-2, 3):
 						self.add_block((x, y + dy, z), blocdisponibles["STONE"], immediate=False)
-		make_map()
+		positiondebutdongeonx,positiondebutdongeony = make_map()
 		hauteurdungeon=4
 		altitudedungeon=2
 #		print mapdungeon
@@ -807,8 +816,11 @@ class Window(pyglet.window.Window):
 	global texteselec
 	global enregistrementdemodele
 
+
 	def __init__(self, *args, **kwargs):
 		super(Window, self).__init__(*args, **kwargs)
+
+		self.model = None
 
 		# Whether or not the window exclusively captures the mouse.
 		self.exclusive = False
@@ -901,7 +913,7 @@ class Window(pyglet.window.Window):
 		elif choix == 2:
 			self.model = cpickle.load( open( "Sauvegardes/saveWorld.p", "rb" ) )
 		"""
-		self.model = Model()
+#		self.model = Model()
 
 
 		# The label that is displayed in the top left of the canvas.
@@ -913,6 +925,11 @@ class Window(pyglet.window.Window):
 		# TICKS_PER_SEC. This is the main game event loop.
 		pyglet.clock.schedule_interval(self.update, 1.0 / TICKS_PER_SEC)
 		pyglet.clock.schedule_interval(self.appelerdeplacerPNJ, 1.0)
+
+
+	def defineworld(self,instancemodel):
+#		super(Window, self).defineworld(instancemodel)
+		self.model = instancemodel
 
 
 	def draw_inventaire(self):
@@ -946,6 +963,7 @@ class Window(pyglet.window.Window):
 		xyz = self.get_sight_vector()
 		x,y,z=self.position
 		Model.deplacerPNJ(self.model,xyz,(x,y,z))
+#		testextaddblock(self.model)
 	
 	
 	"""
@@ -1545,9 +1563,12 @@ def setup():
 
 
 def main():
+	global model
 	window = Window(width=800, height=600, caption='ODFv0.3', resizable=True)
 	# Hide the mouse cursor and prevent the mouse from leaving the window.
 	window.set_exclusive_mouse(False)
+	model = Model()
+	window.defineworld(model)
 	setup()
 	pyglet.app.run()
 

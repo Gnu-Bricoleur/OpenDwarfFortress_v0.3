@@ -26,6 +26,9 @@ TERMINAL_VELOCITY = 50
 
 PLAYER_HEIGHT = 2
 
+
+
+
 # Mes variables globales 
 octaves=5
 tps=time.time()/1000.0
