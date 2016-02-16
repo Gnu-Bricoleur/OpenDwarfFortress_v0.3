@@ -7,6 +7,21 @@ import cPickle as pickle
 from noise import *
 
 
+def ext_remove_block(model,position,immedia):
+	model.remove_block(position,immedia)
+
+def ext_add_block(model,position,block,immedia):
+	model.add_block(position,block,immedia)
+
+
+
+def testextaddblock(model):
+	for z in range(0,100):
+		ext_add_block(model,(0,z,0),blocdisponibles["SAND"],False)
+
+
+
+
 def cube_vertices(x, y, z, n):
 	""" Return the vertices of the cube at position x, y, z with size 2*n.
 

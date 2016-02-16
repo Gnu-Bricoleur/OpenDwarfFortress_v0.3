@@ -1,19 +1,23 @@
 #Ligne de commentaire ignorée par ODF
 #ATTENTION A NE PAS LAISSER DE LIGNES VIDES A LA FIN DU FICHIER
 #fichier au format csv
-#bloc,coord top ,bottom,side,nom, coord miniature,description,destructible,traversable,....
-GRASS,0,15,2,15,3,15,truc
-SAND,2,14,2,14,2,14,truc
-BRICK,7,15,7,15,7,15,truc
-STONE,0,14,0,14,0,14,truc
-WATER,14,2,14,2,14,2,truc
-STONED,1,15,1,15,1,15,truc
-BUISSON,5,12,5,12,5,12,truc
-DIRT,2,15,2, 15,2,15,truc
-FLOWER,12,15,12,15,12,15,truc
-TRONC,5,14,5,14,4,14,truc
-FEUILLAGE,5,7,5,7,5,7,truc
-PNJTETE,6,9,8,8,8,8,truc
-PNJCORP,6,8,6,8,6,8,truc
-WOOD,4,15,4,15,4,15,truc
+#bloc,coord top ,bottom,side,imagetexture,nom, coord miniature,description,destructible,traversable,....
+GRASS,0,15,2,15,3,15,1,truc
+SAND,2,14,2,14,2,14,1,truc
+BRICK,7,15,7,15,7,15,1,truc
+STONE,0,14,0,14,0,14,1,truc
+WATER,14,2,14,2,14,2,1,truc
+STONED,1,15,1,15,1,15,1,truc
+BUISSON,5,12,5,12,5,12,1,truc
+DIRT,2,15,2, 15,2,15,1,truc
+FLOWER,12,15,12,15,12,15,1,truc
+TRONC,5,14,5,14,4,14,1,truc
+FEUILLAGE,5,7,5,7,5,7,1,truc
+CITROUILLETETE,6,9,8,8,8,8,1,truc
+CITROUILLE,6,8,6,8,6,8,1,truc
+WOOD,4,15,4,15,4,15,1,truc
+PNJTETE,1,9,2,9,0,9,2,truc
+PNJCORP,2,9,1,9,3,9,2,truc
+ZOMBIETETE,2,8,2,8,0,8,2,truc
+ZOMBIECORP,2,8,2,8,1,8,2,truc
 #ATTENTION A NE PAS LAISSER DE LIGNES VIDES A LA FIN DU FICHIER

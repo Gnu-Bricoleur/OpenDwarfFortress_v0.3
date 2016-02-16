@@ -51,6 +51,9 @@ dicoPNJ["premierpnj"]=((5,10),(10,5),(-5,-5))
 dicoPNJ["deuxiempnj"]=((3,-5),(4,15),(2,2))
 """
 
+listeZombie = []
+zombies_initialise = False
+
 #size of the map du dungeon
 MAP_WIDTH = 80
 MAP_HEIGHT = 45

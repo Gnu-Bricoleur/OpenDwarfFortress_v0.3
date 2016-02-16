@@ -13,7 +13,7 @@ Les conventions utilisees dans ce programme sont les suivantes : (mise aux norme
 
 
 """
-
+from Code.zombies import *
 from Code.variables_globales import *
 from Code.menu import *
 from Code.orphelins import *
@@ -34,16 +34,6 @@ from pyglet.gl import *
 from pyglet.graphics import TextureGroup
 from pyglet.window import key, mouse
 
-
-
-def ext_add_block(model,position,block,immedia):
-	model.add_block(position,block,immedia)
-
-
-
-def testextaddblock(model):
-	for z in range(0,100):
-		ext_add_block(model,(0,z,0),blocdisponibles["SAND"],False)
 
 
 class Model(object):
@@ -118,9 +108,9 @@ class Model(object):
 						self.remove_block(trajectoire[-1])
 						self.remove_block((trajectoire[-1][0],trajectoire[-1][1]+1,trajectoire[-1][2]))
 					dicopositiondesPNJ[PNJ]=0
-					if texturePNJ[PNJ] == "zombie":
-						self.add_block(trajectoire[0], blocdisponibles["ZOMBIECORP"])
-						self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["ZOMBIETETE"])
+					if texturePNJ[PNJ] == "ranger":
+						self.add_block(trajectoire[0], blocdisponibles["RANGERCORP"])
+						self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["RANGERTETE"])
 					else :
 						self.add_block(trajectoire[0], blocdisponibles["PNJCORP"])
 						self.add_block((trajectoire[0][0],trajectoire[0][1]+1,trajectoire[0][2]), blocdisponibles["PNJTETE"])
@@ -131,9 +121,9 @@ class Model(object):
 						self.remove_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]))
 					dicopositiondesPNJ[PNJ]=dicopositiondesPNJ[PNJ]+1
 					pos=dicopositiondesPNJ[PNJ]
-					if texturePNJ[PNJ] == "zombie":
-						self.add_block(trajectoire[pos], blocdisponibles["ZOMBIECORP"])
-						self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["ZOMBIETETE"])
+					if texturePNJ[PNJ] == "ranger":
+						self.add_block(trajectoire[pos], blocdisponibles["RANGERCORP"])
+						self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["RANGERTETE"])
 					else :
 						self.add_block(trajectoire[pos], blocdisponibles["PNJCORP"])
 						self.add_block((trajectoire[pos][0],trajectoire[pos][1]+1,trajectoire[pos][2]), blocdisponibles["PNJTETE"])
@@ -440,7 +430,7 @@ class Model(object):
 						x=random.randint(-UNDEMILARGEURLONGUEURDUMONDE-5,UNDEMILARGEURLONGUEURDUMONDE-5)
 				listptsdepassage.append((x,y))
 			dicoPNJ[iterat]=listptsdepassage
-			texturePNJ[iterat]="zombie"
+			texturePNJ[iterat]="ranger"
 		nbrdePNJv = random.randint(10,20)
 		nbrdeptsdepassagev = random.randint(3,7)
 		for iterat in range(nbrdePNJ, nbrdePNJ+nbrdePNJv):
@@ -480,6 +470,7 @@ class Model(object):
 			self.add_block(temp[0], blocdisponibles["ZOMBIECORP"], immediate=False)
 			self.add_block((temp[0][0],temp[0][1]+1,temp[0][2]), blocdisponibles["ZOMBIETETE"], immediate=False)
 			dicopositiondesPNJ[PNJ]=0
+		creeZombies()
 
 
 
@@ -683,7 +674,7 @@ class Model(object):
 			self._shown[(x,y+100,z)] = self.batch.add(24, GL_QUADS, self.group,
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
-		elif texture == blocdisponibles["PNJTETE"] or texture == blocdisponibles["PNJCORP"] or texture == blocdisponibles["ZOMBIECORP"] or texture == blocdisponibles["ZOMBIETETE"] :# Mettre une liste plus propre
+		elif texture == blocdisponibles["PNJTETE"] or texture == blocdisponibles["PNJCORP"] or texture == blocdisponibles["ZOMBIECORP"] or texture == blocdisponibles["ZOMBIETETE"] or texture == blocdisponibles["RANGERCORP"] or texture == blocdisponibles["RANGERTETE"]:# Mettre une liste plus propre
 			vertex_data = cube_vertices(x, y, z, 0.5)
 			texture_data = list(texture)
 			# create vertex list
@@ -963,6 +954,7 @@ class Window(pyglet.window.Window):
 		xyz = self.get_sight_vector()
 		x,y,z=self.position
 		Model.deplacerPNJ(self.model,xyz,(x,y,z))
+		deplacerZombies(self.model,(x,y,z))
 #		testextaddblock(self.model)
 	
 	
@@ -1170,7 +1162,7 @@ class Window(pyglet.window.Window):
 					((button == mouse.LEFT) and (modifiers & key.MOD_CTRL)):
 				# ON OSX, control + left click = right click.
 				if previous:
-					if self.model.world[block] == blocdisponibles["PNJTETE"] or self.model.world[block] == blocdisponibles["ZOMBIETETE"] :# Mettre liste onpeut causer
+					if self.model.world[block] == blocdisponibles["PNJTETE"] or self.model.world[block] == blocdisponibles["RANGERTETE"] :# Mettre liste onpeut causer
 						self.tapetexte = True
 						self.questions()
 					else :
