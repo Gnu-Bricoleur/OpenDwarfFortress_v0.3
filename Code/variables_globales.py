@@ -26,7 +26,7 @@ TERMINAL_VELOCITY = 50
 
 PLAYER_HEIGHT = 2
 
-
+souriex,souriey = 0,0
 
 
 # Mes variables globales 

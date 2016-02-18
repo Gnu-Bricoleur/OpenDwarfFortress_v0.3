@@ -353,6 +353,10 @@ class Model(object):
 			self.add_block((x, y , z), blocdisponibles["BUISSON"], immediate=False)
 		elif random.randint(1,10)==2:
 			self.add_block((x, y , z), blocdisponibles["FLOWER"], immediate=False)
+		elif random.randint(1,40)==2:
+			self.add_block((x, y , z), blocdisponibles["TASCAILLASSE"], immediate=False)
+		elif random.randint(1,40)==2:
+			self.add_block((x, y , z), blocdisponibles["TASBOIS"], immediate=False)
 		elif random.randint(1,250)==5:
 			self.arbre(x, y , z)
 		self.biomes[(x,y,z)]='PLAINE'
@@ -361,6 +365,10 @@ class Model(object):
 		self.add_block((x, y-1 , z), blocdisponibles["GRASS"], immediate=False)
 		if random.randint(1,5)==2:
 			self.add_block((x, y , z), blocdisponibles["BUISSON"], immediate=False)
+		elif random.randint(1,30)==2:
+			self.add_block((x, y , z), blocdisponibles["TASCAILLASSE"], immediate=False)
+		elif random.randint(1,30)==2:
+			self.add_block((x, y , z), blocdisponibles["TASBOIS"], immediate=False)
 		elif random.randint(1,100)==2:
 			self.add_block((x, y , z), blocdisponibles["FLOWER"], immediate=False)
 		elif random.randint(1,25)==5:
@@ -530,7 +538,7 @@ class Model(object):
 		"""
 		x, y, z = position
 		for dx, dy, dz in FACES:
-			if ((x + dx, y + dy, z + dz) not in self.world) or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["BUISSON"]) or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["FLOWER"]): #mettre le non du bloc de petits blocs (voir en partie a travers)  
+			if ((x + dx, y + dy, z + dz) not in self.world) or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["BUISSON"]) or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["FLOWER"])or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["TASBOIS"])or (self.world[(x + dx, y + dy, z + dz)]==blocdisponibles["TASCAILLASSE"]): #mettre le non du bloc de petits blocs (voir en partie a travers)  
 				return True
 		return False
 
@@ -672,6 +680,14 @@ class Model(object):
 			# create vertex list
 			# FIXME Maybe `add_indexed()` should be used instead
 			self._shown[(x,y+100,z)] = self.batch.add(24, GL_QUADS, self.group,
+				('v3f/static', vertex_data),
+				('t2f/static', texture_data))
+		elif texture == blocdisponibles["TASCAILLASSE"] or texture == blocdisponibles["TASBOIS"]:
+			vertex_data = cube_vertices(x, y-0.6, z, 0.3)
+			texture_data = list(texture)
+			# create vertex list
+			# FIXME Maybe `add_indexed()` should be used instead
+			self._shown[position] = self.batch.add(24, GL_QUADS, self.group,
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
 		elif texture == blocdisponibles["PNJTETE"] or texture == blocdisponibles["PNJCORP"] or texture == blocdisponibles["ZOMBIECORP"] or texture == blocdisponibles["ZOMBIETETE"] or texture == blocdisponibles["RANGERCORP"] or texture == blocdisponibles["RANGERTETE"]:# Mettre une liste plus propre
@@ -825,6 +841,8 @@ class Window(pyglet.window.Window):
 		# possibilite de taper du texte (reirige les evenements claviers) !!!!!!!!!!!!!!!!!!!!!!!!!! Faudra peut etre bloquer les deplacement des zombis ou ennemis
 		self.tapetexte = False
 
+		self.craftvisible = False
+
 		# Strafing is moving lateral to the direction you are facing,
 		# e.g. moving to the left or right while continuing to face forward.
 		#
@@ -947,7 +965,11 @@ class Window(pyglet.window.Window):
 			absisse = absisse + 50
 		self.batchinventaire.draw()
 
-
+	def draw_craft(self):
+		table = pyglet.image.load('Donnees/Images/craft.png')
+		sprite = pyglet.sprite.Sprite(table)
+		sprite.x,sprite.y = 100,100
+		sprite.draw()
 
 
 	def appelerdeplacerPNJ(self,deltat):
@@ -1128,7 +1150,7 @@ class Window(pyglet.window.Window):
 					op = list(np)
 					op[1] -= dy
 					op[i] += face[i]
-					if tuple(op) not in self.model.world or self.model.world[tuple(op)] == blocdisponibles["BUISSON"] or self.model.world[tuple(op)] == blocdisponibles["FLOWER"]: #Mettre le nom du bloc traversable par le joueur
+					if tuple(op) not in self.model.world or self.model.world[tuple(op)] == blocdisponibles["BUISSON"] or self.model.world[tuple(op)] == blocdisponibles["FLOWER"] or self.model.world[tuple(op)] == blocdisponibles["TASBOIS"] or self.model.world[tuple(op)] == blocdisponibles["TASCAILLASSE"]: #Mettre le nom du bloc traversable par le joueur
 						continue
 					p[i] -= (d - pad) * face[i]
 					if face == (0, -1, 0) or face == (0, 1, 0):
@@ -1155,6 +1177,7 @@ class Window(pyglet.window.Window):
 			mouse button was clicked.
 
 		"""
+		global souriex,souriey
 		if self.exclusive:
 			vector = self.get_sight_vector()
 			block, previous = self.model.hit_test(self.position, vector)
@@ -1181,6 +1204,8 @@ class Window(pyglet.window.Window):
 					if tex in self.inventaire:
 						self.inventaire[tex] = self.inventaire[tex] + 1
 					self.model.remove_block(block)
+		elif self.craftvisible == True:
+			souriex,souriey = x,y
 		else:
 			self.set_exclusive_mouse(True)
 
@@ -1239,6 +1264,12 @@ class Window(pyglet.window.Window):
 				self.strafe[1] -= 1
 			elif symbol == key.D:
 				self.strafe[1] += 1
+			elif symbol == key.E:
+				self.craftvisible = not self.craftvisible
+				self.strafe[0],self.strafe[1]=0,0
+				self.set_exclusive_mouse(False)
+				fenetredecraft()
+				self.set_exclusive_mouse(True)
 			elif symbol == key.C:
 				nomcapture='Sauvegardes/Captures/'+str(graine)+'-'+str(time.time())+'.png'
 				pyglet.image.get_buffer_manager().get_color_buffer().save(nomcapture)
@@ -1456,6 +1487,8 @@ class Window(pyglet.window.Window):
 		glRotatef(-y, math.cos(math.radians(x)), 0, math.sin(math.radians(x)))
 		x, y, z = self.position
 		glTranslatef(-x, -y, -z)
+#		glEnable( GL_BLEND );
+#		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	def on_draw(self):
 		""" Called by pyglet to draw the canvas.
@@ -1470,6 +1503,8 @@ class Window(pyglet.window.Window):
 		self.draw_label()
 		self.draw_reticle()
 		self.draw_inventaire()
+		if self.craftvisible == True:
+			self.draw_craft()
 		if self.tapetexte == True:
 			self.draw_discution()
 

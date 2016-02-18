@@ -20,6 +20,16 @@ def testextaddblock(model):
 		ext_add_block(model,(0,z,0),blocdisponibles["SAND"],False)
 
 
+def fenetredecraft():
+	global souriex, souriey
+	if souriex !=0 and souriey !=0:
+		print "victoire"
+		souriex,soouriey = 0,0
+	print "test"
+
+
+
+
 
 
 def cube_vertices(x, y, z, n):
@@ -86,7 +96,7 @@ def chargeblocs(chemindacces):
 			listelignes.append(l)
 	fichier.close()
 	for ligne in listelignes:                    # Si on veut charger d'autre choses depuis le fichier il faut l'ajouter la !!
-		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]),int(ligne[7]))
+		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]),int(ligne[7]),int(ligne[8]))
 		blocdisponibles[ligne[0]]=tex_coords((int(ligne[1]),int(ligne[2])),(int(ligne[3]),int(ligne[4])),(int(ligne[5]),int(ligne[6])))
 
 

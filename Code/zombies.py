@@ -52,10 +52,13 @@ def deplacerZombies(model,positionjoueur):
 	for zombie in listeZombie:
 		if abs(positionjoueur[0]-zombie[1])<15 and abs(positionjoueur[2]-zombie[3])<15:
 			print "Attention DANGER !!"
-			ext_remove_block(model,(zombie[1],zombie[2],zombie[3]),True)
-			ext_remove_block(model,(zombie[1],zombie[2]+1,zombie[3]),True)
+			ancienx, ancieny,ancienz = zombie[1],zombie[3],zombie[2]
 			a,b = equadedroite(zombie[1],zombie[3],positionjoueur[0],positionjoueur[2])
-			if positionjoueur[0]-zombie[1]<0:
+			if positionjoueur[0] == zombie[1]:
+				zombie[1]=zombie[1]+1
+				x=zombie[1]
+				y=int(a*x+b)
+			elif positionjoueur[0]-zombie[1]<0:
 				x=zombie[1]-1
 				y=int(a*x+b)
 			else:
@@ -67,9 +70,19 @@ def deplacerZombies(model,positionjoueur):
 			#evitement d'obstacle : si il y a un bloc dans le passage passe par dessus
 			zombie[2] = hauteur
 			if (zombie[1],hauteur,zombie[3]) in model.world and not ((zombie[1],hauteur+1,zombie[3]) in model.world) and not((zombie[1],hauteur+2,zombie[3]) in model.world ):
+				ext_remove_block(model,(ancienx,ancienz,ancieny),True)
+				ext_remove_block(model,(ancienx,ancienz+1,ancieny),True)
 				zombie[2] =zombie[2]+1
 				ext_add_block(model,(zombie[1],zombie[2],zombie[3]),blocdisponibles["ZOMBIECORP"],True)
 				ext_add_block(model,(zombie[1],zombie[2]+1,zombie[3]),blocdisponibles["ZOMBIETETE"],True)
-			else:
+				#evitement si obsttacle en hauteur et longeur
+				"""
+			elif not ((zombie[1],hauteur,zombie[3]) in model.world) and not( (zombie[1],hauteur + 1,zombie[3]) in model.world):
+				if ancieny-zombie[3] == 0:
+					zombie
+				"""
+			elif not ((zombie[1],hauteur,zombie[3]) in model.world) and not ((zombie[1],hauteur + 1,zombie[3]) in model.world):
+				ext_remove_block(model,(ancienx,ancienz,ancieny),True)
+				ext_remove_block(model,(ancienx,ancienz + 1,ancieny),True)
 				ext_add_block(model,(zombie[1],zombie[2],zombie[3]),blocdisponibles["ZOMBIECORP"],True)
 				ext_add_block(model,(zombie[1],zombie[2]+1,zombie[3]),blocdisponibles["ZOMBIETETE"],True)
