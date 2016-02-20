@@ -50,6 +50,7 @@ class Model(object):
 		# A TextureGroup manages an OpenGL texture.
 		self.group = TextureGroup(image.load(TEXTURE_PATH1).get_texture())
 		self.group2 = TextureGroup(image.load(TEXTURE_PATH2).get_texture())
+		self.group3 = TextureGroup(image.load(TEXTURE_PATH3).get_texture())
 
 		# A mapping from position to the texture of the block at that position.
 		# This defines all the blocks that are currently in the world.
@@ -255,9 +256,17 @@ class Model(object):
 			posvillex = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
 			posvilley = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
 		self.poserville(posvillex,posvilley, tailleville)
+		self.boiteaoutils()
 
 
-
+	def boiteaoutils(self):
+		self.add_block((0,10,0), blocdisponibles["COUTEAU"], immediate=True)
+		self.add_block((0,11,0), blocdisponibles["PIERRE"], immediate=True)
+		self.add_block((0,12,0), blocdisponibles["HACHETTE"], immediate=True)
+		self.add_block((0,13,0), blocdisponibles["PIOCHE"], immediate=True)
+		self.add_block((0,14,0), blocdisponibles["SCIE"], immediate=True)
+		self.add_block((0,15,0), blocdisponibles["EPEE"], immediate=True)
+		self.add_block((0,16,0), blocdisponibles["SEAU"], immediate=True)
 
 
 
@@ -698,6 +707,14 @@ class Model(object):
 			self._shown[position] = self.batch.add(24, GL_QUADS, self.group2,
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
+		elif texture == blocdisponibles["SCIE"] or texture == blocdisponibles["PIOCHE"] or texture == blocdisponibles["SEAU"] or texture == blocdisponibles["COUTEAU"] or texture == blocdisponibles["EPEE"] or texture == blocdisponibles["PIERRE"] or texture == blocdisponibles["HACHETTE"]:# Mettre une liste plus propre
+			vertex_data = cube_vertices(x, y, z, 0.5)
+			texture_data = list(texture)
+			# create vertex list
+			# FIXME Maybe `add_indexed()` should be used instead
+			self._shown[position] = self.batch.add(24, GL_QUADS, self.group3,
+				('v3f/static', vertex_data),
+				('t2f/static', texture_data))
 		else :
 			vertex_data = cube_vertices(x, y, z, 0.5)
 			texture_data = list(texture)
@@ -706,6 +723,8 @@ class Model(object):
 			self._shown[position] = self.batch.add(24, GL_QUADS, self.group,
 				('v3f/static', vertex_data),
 				('t2f/static', texture_data))
+
+
 
 	def hide_block(self, position, immediate=True):
 		""" Hide the block at the given `position`. Hiding does not remove the
@@ -878,8 +897,9 @@ class Window(pyglet.window.Window):
 
 		# A list of blocks the player can place. Hit num keys to cycle.
 		# Il faudra pas mettre tous les blocs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER","TRONC","WOOD"]
-
+		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER","TRONC","WOOD","PIERRE","SEAU","PIOCHE","EPEE","COUTEAU","HACHETTE","SCIE"]
+		
+		
 		#Qtite de chaque bloc ds l'inventaire. Il faudra changer les nom de variables
 		self.inventaire={}
 		for elt in self.inventory:
@@ -889,9 +909,14 @@ class Window(pyglet.window.Window):
 		self.batchinventaire = pyglet.graphics.Batch()
 		self.sprites = {}
 		self.blocs = pyglet.image.load('Donnees/Images/textureYOGSCAST-OS.png')
+		
+		self.blocs2 = pyglet.image.load("Donnees/Images/outils.png")
 		for elt in self.inventory:
 			coordonee = blocscharge[elt]
-			limage = self.blocs.get_region(x=32*coordonee[2], y=32*coordonee[3], width=32, height=32)
+			if coordonee[6] == 1:
+				limage = self.blocs.get_region(x=32*coordonee[2], y=32*coordonee[3], width=32, height=32)
+			elif coordonee[6] == 3:
+				limage = self.blocs2.get_region(x=32*coordonee[2], y=32*coordonee[3], width=32, height=32)
 			self.sprites[elt]=limage
 			
 			"""
@@ -1177,7 +1202,7 @@ class Window(pyglet.window.Window):
 			mouse button was clicked.
 
 		"""
-		global souriex,souriey
+		global souriex,souriey,afficherfenetrecraft
 		if self.exclusive:
 			vector = self.get_sight_vector()
 			block, previous = self.model.hit_test(self.position, vector)
@@ -1197,15 +1222,26 @@ class Window(pyglet.window.Window):
 								self.inventaire[self.block] = self.inventaire[self.block] - 1
 			elif button == pyglet.window.mouse.LEFT and block:
 				texture = self.model.world[block]
+				if self.block != None and self.inventaire[self.block] != 0:
+					caracoutils = blocscharge[self.block]
+				else :
+					caracoutils = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 				if texture != blocdisponibles["STONE"]: # mettre ici les bloc indestructibles (ou faire un liste plus popre)
 					for clee,elt in blocdisponibles.items():
 						if elt == texture:
 							tex = clee
-					if tex in self.inventaire:
+					caractrucacasser = blocscharge[tex]
+					if tex in self.inventaire and caracoutils[7] >= caractrucacasser[8]:
 						self.inventaire[tex] = self.inventaire[tex] + 1
-					self.model.remove_block(block)
-		elif self.craftvisible == True:
+					if caracoutils[7] > caractrucacasser[8]:
+						self.model.remove_block(block)
+		elif afficherfenetrecraft == True:
 			souriex,souriey = x,y
+			fin = fenetredecraft(x,y)
+			if fin == True:
+				afficherfenetrecraft = False
+				self.craftvisible = False
+				self.set_exclusive_mouse(True)
 		else:
 			self.set_exclusive_mouse(True)
 
@@ -1255,6 +1291,7 @@ class Window(pyglet.window.Window):
 		global enregistrementdemodele
 		global textetape
 		global texteselec
+		global afficherfenetrecraft
 		if self.tapetexte == False :
 			if symbol == key.Z:
 				self.strafe[0] -= 1
@@ -1265,11 +1302,11 @@ class Window(pyglet.window.Window):
 			elif symbol == key.D:
 				self.strafe[1] += 1
 			elif symbol == key.E:
-				self.craftvisible = not self.craftvisible
+				self.craftvisible = True
+				afficherfenetrecraft = True
 				self.strafe[0],self.strafe[1]=0,0
 				self.set_exclusive_mouse(False)
-				fenetredecraft()
-				self.set_exclusive_mouse(True)
+#				fenetredecraft()
 			elif symbol == key.C:
 				nomcapture='Sauvegardes/Captures/'+str(graine)+'-'+str(time.time())+'.png'
 				pyglet.image.get_buffer_manager().get_color_buffer().save(nomcapture)
@@ -1491,9 +1528,11 @@ class Window(pyglet.window.Window):
 #		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	def on_draw(self):
+#		global afficherfenetrecraft
 		""" Called by pyglet to draw the canvas.
 
 		"""
+#		print afficherfenetrecraft
 		self.clear()
 		self.set_3d()
 		glColor3d(1, 1, 1)

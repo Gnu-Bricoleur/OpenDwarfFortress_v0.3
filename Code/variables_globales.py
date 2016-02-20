@@ -27,7 +27,7 @@ TERMINAL_VELOCITY = 50
 PLAYER_HEIGHT = 2
 
 souriex,souriey = 0,0
-
+afficherfenetrecraft = False
 
 # Mes variables globales 
 octaves=5
@@ -78,6 +78,8 @@ texturePNJ = {}
 TEXTURE_PATH1 = 'Donnees/Images/textureYOGSCAST-OS.png'
 
 TEXTURE_PATH2 = 'Donnees/Images/PNJ.png'
+TEXTURE_PATH3 = 'Donnees/Images/outils.png'
+
 pointdepassagevillageoismaison=[]
 texteselec = -1
 textetape = ""

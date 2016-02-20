@@ -7,6 +7,10 @@ import cPickle as pickle
 from noise import *
 
 
+
+
+
+
 def ext_remove_block(model,position,immedia):
 	model.remove_block(position,immedia)
 
@@ -20,12 +24,19 @@ def testextaddblock(model):
 		ext_add_block(model,(0,z,0),blocdisponibles["SAND"],False)
 
 
-def fenetredecraft():
-	global souriex, souriey
+def fenetredecraft(souriex,souriey):
+	global afficherfenetrecraft
+	fin = False
+	if (0<souriex<20) and (0<souriey<20 ) :
+		print "ferme"
+		afficherfenetrecraft = False
+		fin = True
 	if souriex !=0 and souriey !=0:
 		print "victoire"
 		souriex,soouriey = 0,0
 	print "test"
+	return fin
+#	return afficherfenetrecraft
 
 
 
@@ -96,7 +107,7 @@ def chargeblocs(chemindacces):
 			listelignes.append(l)
 	fichier.close()
 	for ligne in listelignes:                    # Si on veut charger d'autre choses depuis le fichier il faut l'ajouter la !!
-		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]),int(ligne[7]),int(ligne[8]))
+		blocscharge[ligne[0]]=(int(ligne[1]),int(ligne[2]),int(ligne[3]),int(ligne[4]),int(ligne[5]),int(ligne[6]),int(ligne[7]),int(ligne[8]),int(ligne[9]))
 		blocdisponibles[ligne[0]]=tex_coords((int(ligne[1]),int(ligne[2])),(int(ligne[3]),int(ligne[4])),(int(ligne[5]),int(ligne[6])))
 
 
