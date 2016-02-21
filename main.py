@@ -260,13 +260,13 @@ class Model(object):
 
 
 	def boiteaoutils(self):
-		self.add_block((0,10,0), blocdisponibles["COUTEAU"], immediate=True)
-		self.add_block((0,11,0), blocdisponibles["PIERRE"], immediate=True)
-		self.add_block((0,12,0), blocdisponibles["HACHETTE"], immediate=True)
-		self.add_block((0,13,0), blocdisponibles["PIOCHE"], immediate=True)
-		self.add_block((0,14,0), blocdisponibles["SCIE"], immediate=True)
-		self.add_block((0,15,0), blocdisponibles["EPEE"], immediate=True)
-		self.add_block((0,16,0), blocdisponibles["SEAU"], immediate=True)
+		self.add_block((0,30,0), blocdisponibles["COUTEAU"], immediate=True)
+		self.add_block((0,31,0), blocdisponibles["PIERRE"], immediate=True)
+		self.add_block((0,32,0), blocdisponibles["HACHETTE"], immediate=True)
+		self.add_block((0,33,0), blocdisponibles["PIOCHE"], immediate=True)
+		self.add_block((0,34,0), blocdisponibles["SCIE"], immediate=True)
+		self.add_block((0,35,0), blocdisponibles["EPEE"], immediate=True)
+		self.add_block((0,36,0), blocdisponibles["SEAU"], immediate=True)
 
 
 
@@ -897,7 +897,7 @@ class Window(pyglet.window.Window):
 
 		# A list of blocks the player can place. Hit num keys to cycle.
 		# Il faudra pas mettre tous les blocs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER","TRONC","WOOD","PIERRE","SEAU","PIOCHE","EPEE","COUTEAU","HACHETTE","SCIE"]
+		self.inventory = ["BRICK", "GRASS", "SAND", "WATER", "STONED", "BUISSON", "DIRT","FLOWER","TRONC","WOOD","PIERRE","SEAU","PIOCHE","EPEE","COUTEAU","HACHETTE","SCIE","TASBOIS","TASCAILLASSE"]
 		
 		
 		#Qtite de chaque bloc ds l'inventaire. Il faudra changer les nom de variables
@@ -907,6 +907,8 @@ class Window(pyglet.window.Window):
 		
 		# a ameillorer pour le chargement et l'appartition
 		self.batchinventaire = pyglet.graphics.Batch()
+		self.batchtablecraft = pyglet.graphics.Batch()
+		self.batchoutilsposs = pyglet.graphics.Batch()
 		self.sprites = {}
 		self.blocs = pyglet.image.load('Donnees/Images/textureYOGSCAST-OS.png')
 		
@@ -991,10 +993,23 @@ class Window(pyglet.window.Window):
 		self.batchinventaire.draw()
 
 	def draw_craft(self):
+		global craftpossibles
+		dessener = []
+		dessener2 = []
 		table = pyglet.image.load('Donnees/Images/craft.png')
-		sprite = pyglet.sprite.Sprite(table)
-		sprite.x,sprite.y = 100,100
-		sprite.draw()
+		spritef = pyglet.sprite.Sprite(table)
+		spritef.x,spritef.y = 150,150
+		spritef.draw()
+		for elt in tabfencraft:
+			sprt = self.sprites[tabfencraft[elt]]
+			dessener.append(pyglet.sprite.Sprite(img=sprt,x=(elt[0]*100)+150,y=(elt[1]*100)+150, batch = self.batchtablecraft))
+		self.batchtablecraft.draw()
+		ordonne = 0
+		for elt in craftpossibles:
+			sprt = self.sprites[dicominicraft[listecraftprdico.index(elt)]]
+			dessener2.append(pyglet.sprite.Sprite(img=sprt,x=500,y=ordonne, batch = self.batchoutilsposs))
+			ordonne = ordonne +50
+		self.batchoutilsposs.draw()
 
 
 	def appelerdeplacerPNJ(self,deltat):
@@ -1202,7 +1217,7 @@ class Window(pyglet.window.Window):
 			mouse button was clicked.
 
 		"""
-		global souriex,souriey,afficherfenetrecraft
+		global souriex,souriey,afficherfenetrecraft,craftpossibles
 		if self.exclusive:
 			vector = self.get_sight_vector()
 			block, previous = self.model.hit_test(self.position, vector)
@@ -1233,11 +1248,15 @@ class Window(pyglet.window.Window):
 					caractrucacasser = blocscharge[tex]
 					if tex in self.inventaire and caracoutils[7] >= caractrucacasser[8]:
 						self.inventaire[tex] = self.inventaire[tex] + 1
-					if caracoutils[7] > caractrucacasser[8]:
+					if caracoutils[7] >= caractrucacasser[8]:
 						self.model.remove_block(block)
 		elif afficherfenetrecraft == True:
 			souriex,souriey = x,y
-			fin = fenetredecraft(x,y)
+			fin, craftpossibles,craftchoisi = fenetredecraft(x,y,self.block,self.inventaire[self.block])
+			if craftchoisi != None and suffisamentdematos(craftchoisi, self.inventaire) == True:
+				for elt in craftchoisi:
+					self.inventaire[craftchoisi[elt]] = self.inventaire[craftchoisi[elt]] -1
+				self.inventaire[dicominicraft[listecraftprdico.index(craftchoisi)]] = self.inventaire[dicominicraft[listecraftprdico.index(craftchoisi)]] + 1
 			if fin == True:
 				afficherfenetrecraft = False
 				self.craftvisible = False

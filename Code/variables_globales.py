@@ -85,6 +85,8 @@ texteselec = -1
 textetape = ""
 flagTexteaetetape = False
 
+tabfencraft = {}
+
 FACES = [
 	( 0, 1, 0),
 	( 0,-1, 0),
@@ -93,6 +95,14 @@ FACES = [
 	( 0, 0, 1),
 	( 0, 0,-1),
 ]
+
+pioche =  {(1,1):"DIRT", (2,1):"DIRT"}
+hachette = {(1,1):"TASBOIS",(1,2):"TASBOIS"}
+listecraftprdico = [pioche,hachette]
+dicominicraft = {0:"PIOCHE",1:"HACHETTE"}
+
+craftpossibles = []
+craftexistants = [pioche,hachette]
 
 
 

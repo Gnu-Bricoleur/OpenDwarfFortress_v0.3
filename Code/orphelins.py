@@ -24,21 +24,54 @@ def testextaddblock(model):
 		ext_add_block(model,(0,z,0),blocdisponibles["SAND"],False)
 
 
-def fenetredecraft(souriex,souriey):
+def fenetredecraft(souriex,souriey,block,qte):
 	global afficherfenetrecraft
+	global tabfencraft
+	craftchoisi = None
+	anglex, angley = 150,150
 	fin = False
-	if (0<souriex<20) and (0<souriey<20 ) :
-		print "ferme"
+	if (0<souriex<50) and (0<souriey<30 ) :
 		afficherfenetrecraft = False
 		fin = True
 	if souriex !=0 and souriey !=0:
-		print "victoire"
+		for x in range(anglex,anglex+400,100):
+			for y in range(angley, angley+400, 100):
+				if x<souriex<x+100 and y<souriey<y+100 :
+					if qte!=0 and block != None:
+						tabfencraft[(((x-anglex)/100),((y-angley)/100))] = block
+						print tabfencraft
+		if 500<souriex<532:
+			for y in range(0,250,50):
+				if y<souriey<y+50:
+					craftchoisi = craftpossibles[(y/50)]
 		souriex,soouriey = 0,0
-	print "test"
-	return fin
+	craftposs = evalcraft()
+	return fin, craftposs, craftchoisi
 #	return afficherfenetrecraft
 
 
+
+def suffisamentdematos(craftchoisi, inventaire):
+	craftpossibles = []
+	for elt in craftchoisi:
+		if inventaire[craftchoisi[elt]] -1 < 0:
+			return False
+	return True
+
+
+
+def evalcraft():
+	global craftpossibles
+	global tabfencraft
+	completude = 1
+	for craft in craftexistants:
+		for elt in craft:
+			if elt in tabfencraft:
+				if tabfencraft[elt] == craft[elt]:
+					completude = completude +1
+		if completude == len(craft.keys()):
+			craftpossibles.append(craft)
+	return craftpossibles
 
 
 
