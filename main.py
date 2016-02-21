@@ -17,6 +17,8 @@ from Code.zombies import *
 from Code.variables_globales import *
 from Code.menu import *
 from Code.orphelins import *
+from Code.physique import *
+
 
 import math
 import random
@@ -178,6 +180,7 @@ class Model(object):
 						self.add_block((x, increment , z), blocdisponibles["SAND"], immediate=False)
 					for increment in xrange(hauteur, 10, 1):
 						self.add_block((x, increment , z), blocdisponibles["WATER"], immediate=False)
+						blocseauforce[(x, increment , z)] = 1000
 				if 10 < hauteur < 20:
 #                    if indexbiome == taillebiome:
 #                        taillebiome = 0
@@ -840,7 +843,7 @@ class Model(object):
 class Window(pyglet.window.Window):
 
 	global texteselec
-	global enregistrementdemodele
+	global enregistrementdemodele, blocsaverifierpreau
 
 
 	def __init__(self, *args, **kwargs):
@@ -963,6 +966,7 @@ class Window(pyglet.window.Window):
 		pyglet.clock.schedule_interval(self.appelerdeplacerPNJ, 1.0)
 
 
+
 	def defineworld(self,instancemodel):
 #		super(Window, self).defineworld(instancemodel)
 		self.model = instancemodel
@@ -1017,6 +1021,7 @@ class Window(pyglet.window.Window):
 		x,y,z=self.position
 		Model.deplacerPNJ(self.model,xyz,(x,y,z))
 		deplacerZombies(self.model,(x,y,z))
+		checkwater(self.model)
 #		testextaddblock(self.model)
 	
 	
@@ -1217,7 +1222,7 @@ class Window(pyglet.window.Window):
 			mouse button was clicked.
 
 		"""
-		global souriex,souriey,afficherfenetrecraft,craftpossibles
+		global souriex,souriey,afficherfenetrecraft,craftpossibles, blocsaverifierpreau
 		if self.exclusive:
 			vector = self.get_sight_vector()
 			block, previous = self.model.hit_test(self.position, vector)
@@ -1235,13 +1240,16 @@ class Window(pyglet.window.Window):
 							if self.inventaire[self.block] != 0:
 								self.model.add_block(previous, blocdisponibles[self.block])
 								self.inventaire[self.block] = self.inventaire[self.block] - 1
+								if self.block == blocdisponibles["WATER"]:
+									blocseauforce[previous] = 0
+									blocsdeauajoute.append(previous)
 			elif button == pyglet.window.mouse.LEFT and block:
 				texture = self.model.world[block]
 				if self.block != None and self.inventaire[self.block] != 0:
 					caracoutils = blocscharge[self.block]
 				else :
 					caracoutils = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-				if texture != blocdisponibles["STONE"]: # mettre ici les bloc indestructibles (ou faire un liste plus popre)
+				if texture != blocdisponibles["STONE"]: # mettre ici les blocs indestructibles (ou faire un liste plus popre)
 					for clee,elt in blocdisponibles.items():
 						if elt == texture:
 							tex = clee
@@ -1250,6 +1258,8 @@ class Window(pyglet.window.Window):
 						self.inventaire[tex] = self.inventaire[tex] + 1
 					if caracoutils[7] >= caractrucacasser[8]:
 						self.model.remove_block(block)
+						if block[1]<10: # Le niveau max de l'eau tant qu'iln'y a pas de cascades
+							blocsaverifierpreau.append(block)
 		elif afficherfenetrecraft == True:
 			souriex,souriey = x,y
 			fin, craftpossibles,craftchoisi = fenetredecraft(x,y,self.block,self.inventaire[self.block])

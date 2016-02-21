@@ -52,7 +52,6 @@ def fenetredecraft(souriex,souriey,block,qte):
 
 
 def suffisamentdematos(craftchoisi, inventaire):
-	craftpossibles = []
 	for elt in craftchoisi:
 		if inventaire[craftchoisi[elt]] -1 < 0:
 			return False
@@ -64,6 +63,7 @@ def evalcraft():
 	global craftpossibles
 	global tabfencraft
 	completude = 1
+	craftpossibles = []
 	for craft in craftexistants:
 		for elt in craft:
 			if elt in tabfencraft:

@@ -96,13 +96,30 @@ FACES = [
 	( 0, 0,-1),
 ]
 
-pioche =  {(1,1):"DIRT", (2,1):"DIRT"}
-hachette = {(1,1):"TASBOIS",(1,2):"TASBOIS"}
+pioche =  {(2,1):"TASBOIS", (2,2):"TASBOIS",(3,1):"TASCAILLASSE",(3,2):"TASCAILLASSE",(3,3):"TASCAILLASSE"}
+hachette = {(2,1):"TASBOIS", (2,2):"TASBOIS",(3,1):"TASCAILLASSE",(3,2):"TASCAILLASSE",}
 listecraftprdico = [pioche,hachette]
 dicominicraft = {0:"PIOCHE",1:"HACHETTE"}
 
 craftpossibles = []
 craftexistants = [pioche,hachette]
+
+
+
+
+
+
+
+# Variables pour physique !
+
+blocseauforce = {}
+arbres = {}
+blocsaverifierpreau = []
+
+blocsdeauajoute = []
+
+
+
 
 
 
