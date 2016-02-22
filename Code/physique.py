@@ -47,10 +47,10 @@ def checkwater(model):
 
 def checkarbres(model,boiscoupe):
 	global dicoarbresfeuillages,dicoarbrestroncs,arbreattaque
-	print "j'y suis"
+#	print "j'y suis"
 	print boiscoupe
 	for elt in boiscoupe:
-		print "ccc"
+#		print "ccc"
 		for arbres in dicoarbrestroncs:
 			if elt in dicoarbrestroncs[arbres]:
 				arbreattaque.append(arbres)
@@ -59,7 +59,7 @@ def checkarbres(model,boiscoupe):
 		for blocs in dicoarbresfeuillages[arbres]:
 			if blocs in model.world :
 				ext_remove_block(model, blocs,True)
-		print "suprime"
+#		print "suprime"
 		for blocs in dicoarbrestroncs[arbres]:
 			if blocs in model.world :
 				ext_remove_block(model, blocs,True)
