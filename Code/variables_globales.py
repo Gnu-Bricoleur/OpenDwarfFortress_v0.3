@@ -118,6 +118,11 @@ blocsaverifierpreau = []
 
 blocsdeauajoute = []
 
+dicoarbrestroncs = {}
+dicoarbresfeuillages = {}
+boiscoupe = []
+arbreattaque = []
+
 
 
 

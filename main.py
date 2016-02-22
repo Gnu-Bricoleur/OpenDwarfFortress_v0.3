@@ -44,6 +44,7 @@ class Model(object):
 	global enregistrementdemodele
 	global positiondebutdongeonx,positiondebutdongeony
 	global dicoPNJ
+	global dicoarbrestroncs, dicoarbrestroncs
 	def __init__(self):
 
 		# A Batch is a collection of vertex lists for batched rendering.
@@ -389,6 +390,9 @@ class Model(object):
 
 
 	def arbre(self,xo,yo,zo) :
+		global dicoarbresfeuillages, dicoarbrestroncs
+		dicoarbrestroncs[(xo,yo,zo)] =[]
+		dicoarbresfeuillages[(xo,yo,zo)]= []
 #        self.add_block((x, hauteur , z), TRONC, immediate=False)
 		taillearbre=random.randint(5,10)
 		for i in xrange(0, taillearbre, 1):
@@ -396,15 +400,21 @@ class Model(object):
 				self.add_block((xo+1, i+yo , zo), blocdisponibles["TRONC"], immediate=False)
 				self.add_block((xo+1, i+yo , zo+1), blocdisponibles["TRONC"], immediate=False)
 				self.add_block((xo, i+yo , zo+1), blocdisponibles["TRONC"], immediate=False)
+				dicoarbrestroncs[(xo,yo,zo)].append((xo+1, i+yo , zo))
+				dicoarbrestroncs[(xo,yo,zo)].append((xo+1, i+yo , zo+1))
+				dicoarbrestroncs[(xo,yo,zo)].append((xo, i+yo , zo+1))
 			self.add_block((xo, i+yo , zo), blocdisponibles["TRONC"], immediate=False)
+			dicoarbrestroncs[(xo,yo,zo)].append((xo, i+yo , zo))
 		rayonfeuillage=random.randint(2,4)+int(taillearbre/3)
 		for y in xrange(yo-rayonfeuillage+taillearbre, yo+rayonfeuillage+taillearbre, 1):
 			for x in xrange(xo-rayonfeuillage,xo+rayonfeuillage , 1):
 				for z in xrange(zo-rayonfeuillage,zo+rayonfeuillage , 1):
 					if (y-yo)**2+(x-xo)**2+(z-zo)**2 < rayonfeuillage**2:
 						self.add_block((x, y+taillearbre-3, z), blocdisponibles["FEUILLAGE"], immediate=False)
+						dicoarbresfeuillages[(xo,yo,zo)].append((x, y+taillearbre-3, z))
 					if math.ceil((y-yo)**2+(x-xo)**2+(z-zo)**2) == rayonfeuillage**2 and random.randint(1,10)>8:
 						self.add_block((x, y+taillearbre-3, z), blocdisponibles["FEUILLAGE"], immediate=False)
+						dicoarbresfeuillages[(xo,yo,zo)].append((x, y+taillearbre-3, z))
 
 
 	"""
@@ -843,7 +853,7 @@ class Model(object):
 class Window(pyglet.window.Window):
 
 	global texteselec
-	global enregistrementdemodele, blocsaverifierpreau
+	global enregistrementdemodele, blocsaverifierpreau,blocsdeauajoute,blocseauforce, boiscoupe
 
 
 	def __init__(self, *args, **kwargs):
@@ -1022,6 +1032,7 @@ class Window(pyglet.window.Window):
 		Model.deplacerPNJ(self.model,xyz,(x,y,z))
 		deplacerZombies(self.model,(x,y,z))
 		checkwater(self.model)
+		checkarbres(self.model,boiscoupe)
 #		testextaddblock(self.model)
 	
 	
@@ -1222,7 +1233,7 @@ class Window(pyglet.window.Window):
 			mouse button was clicked.
 
 		"""
-		global souriex,souriey,afficherfenetrecraft,craftpossibles, blocsaverifierpreau
+		global souriex,souriey,afficherfenetrecraft,craftpossibles, blocsaverifierpreau,blocsdeauajoute,blocseauforce,boiscoupe
 		if self.exclusive:
 			vector = self.get_sight_vector()
 			block, previous = self.model.hit_test(self.position, vector)
@@ -1236,11 +1247,14 @@ class Window(pyglet.window.Window):
 					else :
 						if self.creative:
 							self.model.add_block(previous, blocdisponibles[self.block])
+							if blocdisponibles[self.block] == blocdisponibles["WATER"]:
+								blocseauforce[previous] = 0
+								blocsdeauajoute.append(previous)
 						else :
 							if self.inventaire[self.block] != 0:
 								self.model.add_block(previous, blocdisponibles[self.block])
 								self.inventaire[self.block] = self.inventaire[self.block] - 1
-								if self.block == blocdisponibles["WATER"]:
+								if blocdisponibles[self.block] == blocdisponibles["WATER"]:
 									blocseauforce[previous] = 0
 									blocsdeauajoute.append(previous)
 			elif button == pyglet.window.mouse.LEFT and block:
@@ -1257,9 +1271,12 @@ class Window(pyglet.window.Window):
 					if tex in self.inventaire and caracoutils[7] >= caractrucacasser[8]:
 						self.inventaire[tex] = self.inventaire[tex] + 1
 					if caracoutils[7] >= caractrucacasser[8]:
+						if texture == blocdisponibles["TRONC"]:
+							boiscoupe.append(block)
 						self.model.remove_block(block)
-						if block[1]<10: # Le niveau max de l'eau tant qu'iln'y a pas de cascades
-							blocsaverifierpreau.append(block)
+#						print boiscoupe
+						if block[1]<10: # Le niveau max de l'eau tant qu'il n'y a pas de cascades
+							blocsaverifierpreau.append(block) 
 		elif afficherfenetrecraft == True:
 			souriex,souriey = x,y
 			fin, craftpossibles,craftchoisi = fenetredecraft(x,y,self.block,self.inventaire[self.block])

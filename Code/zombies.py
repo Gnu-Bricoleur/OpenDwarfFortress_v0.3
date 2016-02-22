@@ -48,7 +48,7 @@ def deplacerZombies(model,positionjoueur):
 	if zombies_initialise == False:
 		initZombies(model)
 		zombies_initialise = True
-	print positionjoueur
+#	print positionjoueur
 	for zombie in listeZombie:
 		if abs(positionjoueur[0]-zombie[1])<15 and abs(positionjoueur[2]-zombie[3])<15:
 			print "Attention DANGER !!"
