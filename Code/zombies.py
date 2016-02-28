@@ -86,3 +86,8 @@ def deplacerZombies(model,positionjoueur):
 				ext_remove_block(model,(ancienx,ancienz + 1,ancieny),True)
 				ext_add_block(model,(zombie[1],zombie[2],zombie[3]),blocdisponibles["ZOMBIECORP"],True)
 				ext_add_block(model,(zombie[1],zombie[2]+1,zombie[3]),blocdisponibles["ZOMBIETETE"],True)
+
+
+
+
+

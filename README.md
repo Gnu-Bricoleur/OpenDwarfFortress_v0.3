@@ -6,9 +6,10 @@ Pour comprendre le code rendez vous sur le wiki : http://gnu-bricoleur.tuxfamily
 
 Et pour suivre l'avancement du projet, passez sur mon blog : http://gnu-bricoleur.tuxfamily.org/  
   
-##Pour installer ODF, 4 petites étapes :   
+##Pour installer ODF, 5 petites étapes :   
 Ouvrez une console dans le dossier ou vous souhaitez installer ODF et tapez :  
-  
+
+sudo apt-get install python-pip python-dev git  
 git clone https://github.com/Gnu-Bricoleur/OpenDwarfFortress_v0.3.git  
 cd OpenDwarfFortress_v0.3  
 pip install -r requirements.txt  
