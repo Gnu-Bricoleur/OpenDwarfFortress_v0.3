@@ -18,7 +18,7 @@ from Code.variables_globales import *
 from Code.menu import *
 from Code.orphelins import *
 from Code.physique import *
-
+from Code.multi import *
 
 import math
 import random
@@ -45,6 +45,8 @@ class Model(object):
 	global positiondebutdongeonx,positiondebutdongeony
 	global dicoPNJ
 	global dicoarbrestroncs, dicoarbrestroncs
+	global blocsaenvoyerajo,blocsaenvoyersup
+
 	def __init__(self):
 
 		# A Batch is a collection of vertex lists for batched rendering.
@@ -74,6 +76,8 @@ class Model(object):
 		# Mapping from sector to a list of positions inside that sector.
 		self.sectors = {}
 
+
+		self.jeucommence = False
 		# Simple function queue implementation. The queue is populated with
 		# _show_block() and _hide_block() calls
 		self.queue = deque()
@@ -259,8 +263,9 @@ class Model(object):
 		while self.pasdeau(posvillex,posvilley, tailleville) != True :
 			posvillex = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
 			posvilley = random.randint(-UNDEMILARGEURLONGUEURDUMONDE+tailleville,UNDEMILARGEURLONGUEURDUMONDE-tailleville)
-		self.poserville(posvillex,posvilley, tailleville)
+		pointdepassagevillageoismaison = self.poserville(posvillex,posvilley, tailleville)
 		self.boiteaoutils()
+		return pointdepassagevillageoismaison
 
 
 	def boiteaoutils(self):
@@ -335,6 +340,7 @@ class Model(object):
 						hauteurmin = hauteur
 			for elements in modelemaison:
 				self.add_block((elements[0]+coordonne[0],elements[1]+hauteurmin,elements[2]+coordonne[1]), modelemaison[elements], immediate=False)
+		return pointdepassagevillageoismaison
 
 
 
@@ -447,7 +453,7 @@ class Model(object):
 
 
 
-	def remplirdicoPNJ(self):
+	def remplirdicoPNJ(self, pointdepassagevillageoismaison):
 		nbrdePNJ = random.randint(10,20)
 		nbrdeptsdepassage = random.randint(3,7)
 		for iterat in range(nbrdePNJ):
@@ -466,6 +472,7 @@ class Model(object):
 		for iterat in range(nbrdePNJ, nbrdePNJ+nbrdePNJv):
 			listptsdepassagev=[]
 			for itera in range(nbrdeptsdepassagev):
+#				print len(pointdepassagevillageoismaison)-1
 				ptsv=random.randint(0,len(pointdepassagevillageoismaison)-1)
 				if listptsdepassagev != []:
 					while listptsdepassagev[-1] == pointdepassagevillageoismaison[ptsv] or listptsdepassagev[-1][0] == pointdepassagevillageoismaison[ptsv][0] or listptsdepassage[0][0] == pointdepassagevillageoismaison[ptsv][0]:
@@ -483,17 +490,19 @@ class Model(object):
 		
 		"""
 		if choix == 1 :
-			self.creer_monde()
+			pointdepassagevillageoismaison = self.creer_monde()
 		elif choix == 2:
 			s,dico = self.charge()
 			graine=s
-			self.creer_monde()
+			pointdepassagevillageoismaison = self.creer_monde()
 			for elt in dico:
 				if dico[elt]=="pasblocpasbloc":
 					self.remove_block(elt, immediate=True)
 				else:
 					self.add_block(elt, dico[elt], immediate=False)
-		self.remplirdicoPNJ()
+		elif choix == 4 or choix == 3:
+			pointdepassagevillageoismaison = self.creer_monde()
+		self.remplirdicoPNJ(pointdepassagevillageoismaison)
 		for PNJ in dicoPNJ:
 			dicotrajectoirePNJ[PNJ]=generertrajectoire(PNJ)
 			temp=dicotrajectoirePNJ[PNJ]
@@ -568,7 +577,7 @@ class Model(object):
 
 
 	def add_block(self, position, texture, immediate=True):
-		global positionpremierbloc
+		global positionpremierbloc,blocsaenvoyerajo,blocsaenvoyersup
 		
 		""" Add a block with the given `texture` and `position` to the world.
 
@@ -583,20 +592,26 @@ class Model(object):
 			Whether or not to draw the block immediately.
 
 		"""
+#		print "ajo" + str(position)
 		if enregistrementdemodele == True:
 			if modeleenenregistrement == {} and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"]:
 				positionpremierbloc=position
+			if texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"]:
+				modeleenenregistrement[(position[0]-positionpremierbloc[0],position[1]-positionpremierbloc[1],position[2]-positionpremierbloc[2])]=texture
 		if texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"]:
-			modeleenenregistrement[(position[0]-positionpremierbloc[0],position[1]-positionpremierbloc[1],position[2]-positionpremierbloc[2])]=texture
 			modifsasauvegarder[position]=texture
 		if position in self.world:
 			self.remove_block(position, immediate)
+		blocsaenvoyerajo.append([position,texture])
 		self.world[position] = texture
 		self.sectors.setdefault(sectorize(position), []).append(position)
 		if immediate:
 			if self.exposed(position):
 				self.show_block(position)
 			self.check_neighbors(position)
+#		print blocsaenvoyerajo
+		if self.jeucommence == True and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"] and texture != blocdisponibles["RANGERCORP"] and texture != blocdisponibles["RANGERTETE"]:
+			stocksync([position,texture],[])
 
 	def remove_block(self, position, immediate=True):
 		""" Remove the block at the given `position`.
@@ -609,12 +624,18 @@ class Model(object):
 			Whether or not to immediately remove block from canvas.
 
 		"""
+		
+		global blocsaenvoyerajo,blocsaenvoyersup
 		try:
 			del modifsasauvegarder[position]
 		except:
 			modifsasauvegarder[position]="pasblocpasbloc"
 		if position in self.world:
+			texture = self.world[position]
+			if self.jeucommence == True and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"] and texture != blocdisponibles["RANGERCORP"] and texture != blocdisponibles["RANGERTETE"]:
+				stocksync([],position)
 			del self.world[position]
+			blocsaenvoyersup.append(position)
 			self.sectors[sectorize(position)].remove(position)
 			if immediate:
 				if position in self.shown:
@@ -622,6 +643,8 @@ class Model(object):
 				self.check_neighbors(position)
 		else:
 			pass
+#		print blocsaenvoyersup
+
 
 	def check_neighbors(self, position):
 		""" Check all blocks surrounding `position` and ensure their visual
@@ -974,7 +997,12 @@ class Window(pyglet.window.Window):
 		# TICKS_PER_SEC. This is the main game event loop.
 		pyglet.clock.schedule_interval(self.update, 1.0 / TICKS_PER_SEC)
 		pyglet.clock.schedule_interval(self.appelerdeplacerPNJ, 1.0)
+#		pyglet.clock.schedule_interval(self.undixieme(), 3)
 
+	"""
+	def undixieme(self):
+		syncreseau(self.model)
+	"""
 
 
 	def defineworld(self,instancemodel):
@@ -1033,6 +1061,7 @@ class Window(pyglet.window.Window):
 		deplacerZombies(self.model,(x,y,z))
 		checkwater(self.model)
 		checkarbres(self.model,boiscoupe)
+		syncreseau(self.model)
 #		testextaddblock(self.model)
 	
 	
@@ -1338,6 +1367,7 @@ class Window(pyglet.window.Window):
 		global textetape
 		global texteselec
 		global afficherfenetrecraft
+		self.model.jeucommence = True
 		if self.tapetexte == False :
 			if symbol == key.Z:
 				self.strafe[0] -= 1
@@ -1684,9 +1714,27 @@ def main():
 	setup()
 	pyglet.app.run()
 
+"""
 
-def initialisations():
-	random.seed(graine)
+AJOUTER lenvoi des de la seed au demarrage 
+"""
+
+def initialisations(choix):
+	global graine
+	initreseau("Donnees/configreseau.conf")
+	if choix == 1:
+		random.seed(graine)
+	elif choix == 3 :
+		graine = startclient()
+		print graine
+		CLIENT = True
+		random.seed(graine)
+	elif choix == 4 :
+		random.seed(graine)
+		startserveur()
+		SERVEUR = True
+#		attenteconnection()
+		print "client connecte !"
 	chargeblocs("Donnees/blocs.bloc")
 
 
@@ -1695,9 +1743,9 @@ def initialisations():
 #picklableMethod = MethodProxy(someObj, someObj.method)
 
 if __name__ == '__main__':
-	initialisations()
 	choix = menu()
-	while choix ==0:
+	while choix == 0:
 		continue
+	initialisations(choix)
 	main()
 

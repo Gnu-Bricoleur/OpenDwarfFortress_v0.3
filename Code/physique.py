@@ -48,7 +48,7 @@ def checkwater(model):
 def checkarbres(model,boiscoupe):
 	global dicoarbresfeuillages,dicoarbrestroncs,arbreattaque
 #	print "j'y suis"
-	print boiscoupe
+#	print boiscoupe
 	for elt in boiscoupe:
 #		print "ccc"
 		for arbres in dicoarbrestroncs:

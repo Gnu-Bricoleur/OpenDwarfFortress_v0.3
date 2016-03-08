@@ -1,4 +1,4 @@
-
+from multi import *
 
 import pygame
 from pygame.locals import *
@@ -30,16 +30,18 @@ def menu():
 		texta = font.render("(a)-Nouvelle partie", 1, (10, 10, 10))
 		textz = font.render("(z)-Charger ancienne partie", 1, (10, 10, 10))
 		texte = font.render("(e)-Quitter", 1, (10, 10, 10))
-		textr = font.render("(r)-Tests", 1, (10, 10, 10))
+		textr = font.render("(r)-Multi Client", 1, (10, 10, 10))
+		textt = font.render("(t)-Multi Serveur", 1, (10, 10, 10))
 		textposa = (200,200)
 		textposz = (200,220)
 		textpose = (200,240)
 		textposr = (200,260)
+		textpost = (200,280)
 		fenetre.blit(texta, textposa)
 		fenetre.blit(textz, textposz)
 		fenetre.blit(texte, textpose)
 		fenetre.blit(textr, textposr)
-		
+		fenetre.blit(textt, textpost)
 		font = pygame.font.Font("Donnees/SDS.ttf", 8)
 		text = font.render("credits : Sylvain Migaud", 1, (10, 10, 10))
 		textpos = (50,400)
@@ -69,10 +71,15 @@ def menu():
 					fenetre.blit(textz, textposz)
 					choix=2
 				if event.key == K_r:
-					textz = font.render("(r)-Tests", 1, (255, 10, 255))
-					textposz = (200,260)
-					fenetre.blit(textz, textposz)
+					textr = font.render("(r)-Multi Client", 1, (255, 10, 255))
+					textposr = (200,260)
+					fenetre.blit(textr, textposr)
 					choix=3
+				if event.key == K_t:
+					textt = font.render("(t)-Multi Serveur", 1, (150, 10, 150))
+					textpost = (200,280)
+					fenetre.blit(textt, textpost)
+					choix=4
 				if event.key == K_n:
 					Model.save()
 				if event.key == K_RETURN and choix != 0:

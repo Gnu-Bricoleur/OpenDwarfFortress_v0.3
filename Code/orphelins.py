@@ -39,7 +39,7 @@ def fenetredecraft(souriex,souriey,block,qte):
 				if x<souriex<x+100 and y<souriey<y+100 :
 					if qte!=0 and block != None:
 						tabfencraft[(((x-anglex)/100),((y-angley)/100))] = block
-						print tabfencraft
+#						print tabfencraft
 		if 500<souriex<532:
 			for y in range(0,250,50):
 				if y<souriey<y+50:
@@ -247,7 +247,7 @@ def generertrajectoire(PNJ):
 			trajectemp.append((carrex,carrey))
 			trajectoire.append((carrex,hauteur,carrey))
 		iterateur=iterateur + 0.1
-	print trajectoire
+#	print trajectoire
 	return trajectoire
 
 

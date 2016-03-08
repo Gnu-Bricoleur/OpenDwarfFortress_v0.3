@@ -123,8 +123,24 @@ dicoarbresfeuillages = {}
 boiscoupe = []
 arbreattaque = []
 
+#Variables pour le multi !!!!!!!!!!
 
+clientsconnecte = False
 
+SERVEUR = False
+CLIENT = False
+adresseserveur = "localhost"
+portserveur = "12800"
 
+blocsaenvoyersup = []
+blocsaenvoyerajo = []
 
+blocsrecusup = []
+blocsrecuajo = []
 
+clients_connectes = []
+clients_a_lire = []
+
+connection_principale = None
+connexion_avec_serveur = None
+connexion_avec_client = None
