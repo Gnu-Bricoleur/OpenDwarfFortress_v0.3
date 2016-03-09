@@ -602,7 +602,6 @@ class Model(object):
 			modifsasauvegarder[position]=texture
 		if position in self.world:
 			self.remove_block(position, immediate)
-		blocsaenvoyerajo.append([position,texture])
 		self.world[position] = texture
 		self.sectors.setdefault(sectorize(position), []).append(position)
 		if immediate:
@@ -610,8 +609,9 @@ class Model(object):
 				self.show_block(position)
 			self.check_neighbors(position)
 #		print blocsaenvoyerajo
-		if self.jeucommence == True and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"] and texture != blocdisponibles["RANGERCORP"] and texture != blocdisponibles["RANGERTETE"]:
-			stocksync([position,texture],[])
+		# Desactive pour mieux comprendre et deplace dans section clics peut etre a remettre !!!!!
+#		if self.jeucommence == True and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"] and texture != blocdisponibles["RANGERCORP"] and texture != blocdisponibles["RANGERTETE"]:
+#			stocksync([position,texture],[])
 
 	def remove_block(self, position, immediate=True):
 		""" Remove the block at the given `position`.
@@ -632,10 +632,10 @@ class Model(object):
 			modifsasauvegarder[position]="pasblocpasbloc"
 		if position in self.world:
 			texture = self.world[position]
-			if self.jeucommence == True and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"] and texture != blocdisponibles["RANGERCORP"] and texture != blocdisponibles["RANGERTETE"]:
-				stocksync([],position)
+		# Desactive pour mieux comprendre et deplace dans section clics peut etre a remettre !!!!!
+#			if self.jeucommence == True and texture != blocdisponibles["PNJTETE"] and texture != blocdisponibles["PNJCORP"] and texture != blocdisponibles["ZOMBIECORP"] and texture != blocdisponibles["ZOMBIETETE"] and texture != blocdisponibles["RANGERCORP"] and texture != blocdisponibles["RANGERTETE"]:
+#				stocksync([],position)
 			del self.world[position]
-			blocsaenvoyersup.append(position)
 			self.sectors[sectorize(position)].remove(position)
 			if immediate:
 				if position in self.shown:
@@ -1286,6 +1286,7 @@ class Window(pyglet.window.Window):
 								if blocdisponibles[self.block] == blocdisponibles["WATER"]:
 									blocseauforce[previous] = 0
 									blocsdeauajoute.append(previous)
+						stocksync([previous,blocdisponibles[self.block]],[])
 			elif button == pyglet.window.mouse.LEFT and block:
 				texture = self.model.world[block]
 				if self.block != None and self.inventaire[self.block] != 0:
@@ -1302,6 +1303,7 @@ class Window(pyglet.window.Window):
 					if caracoutils[7] >= caractrucacasser[8]:
 						if texture == blocdisponibles["TRONC"]:
 							boiscoupe.append(block)
+						stocksync([],block)
 						self.model.remove_block(block)
 #						print boiscoupe
 						if block[1]<10: # Le niveau max de l'eau tant qu'il n'y a pas de cascades
